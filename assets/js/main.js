@@ -88,6 +88,82 @@
 
 // Main JavaScript for Consultant Website
 
+function addSwipeNavigation(element, handlers = {}, options = {}) {
+    if (!element || element.dataset.swipeNavigationBound === 'true') return;
+
+    element.dataset.swipeNavigationBound = 'true';
+    element.classList.add('swipe-navigation');
+    const threshold = options.threshold || 45;
+    const restraint = options.restraint || 90;
+    const resumeDelay = options.resumeDelay || 1400;
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let isDragging = false;
+    let resumeTimer = null;
+
+    function pause() {
+        if (resumeTimer) clearTimeout(resumeTimer);
+        if (typeof handlers.pause === 'function') handlers.pause();
+    }
+
+    function resume() {
+        if (typeof handlers.resume !== 'function') return;
+        if (resumeTimer) clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(() => {
+            handlers.resume();
+        }, resumeDelay);
+    }
+
+    function finishDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        element.classList.remove('is-dragging');
+
+        const deltaX = currentX - startX;
+        const deltaY = Math.abs(currentY - startY);
+
+        if (Math.abs(deltaX) >= threshold && deltaY <= restraint) {
+            if (deltaX < 0 && typeof handlers.next === 'function') {
+                handlers.next();
+            } else if (deltaX > 0 && typeof handlers.prev === 'function') {
+                handlers.prev();
+            }
+        }
+
+        resume();
+    }
+
+    element.addEventListener('pointerdown', (event) => {
+        if (event.button !== undefined && event.button !== 0) return;
+        isDragging = true;
+        startX = event.clientX;
+        startY = event.clientY;
+        currentX = event.clientX;
+        currentY = event.clientY;
+        element.classList.add('is-dragging');
+        pause();
+
+        if (typeof element.setPointerCapture === 'function') {
+            element.setPointerCapture(event.pointerId);
+        }
+    });
+
+    element.addEventListener('pointermove', (event) => {
+        if (!isDragging) return;
+        currentX = event.clientX;
+        currentY = event.clientY;
+    });
+
+    element.addEventListener('pointerup', finishDrag);
+    element.addEventListener('pointercancel', () => {
+        isDragging = false;
+        element.classList.remove('is-dragging');
+        resume();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Mobile Menu Toggle
     const mobileMenuBtn = document.querySelector('.mobile-menu');
@@ -95,35 +171,110 @@ document.addEventListener('DOMContentLoaded', function() {
     const navbar = document.querySelector('.navbar');
 
     if (mobileMenuBtn && navMenu) {
+        const navId = navMenu.id || 'primary-navigation';
+        const header = mobileMenuBtn.closest('.header');
+        const closeItem = document.createElement('li');
+        const closeBtn = document.createElement('button');
+        const overlay = document.createElement('div');
+
+        navMenu.id = navId;
+
+        if (!navMenu.querySelector('.mobile-menu-close')) {
+            closeItem.className = 'mobile-menu-close-item';
+            closeBtn.type = 'button';
+            closeBtn.className = 'mobile-menu-close';
+            closeBtn.setAttribute('aria-label', 'Close navigation menu');
+            closeBtn.innerHTML = '<span aria-hidden="true"></span>';
+            closeItem.appendChild(closeBtn);
+            navMenu.insertBefore(closeItem, navMenu.firstChild);
+        }
+
+        if (!document.querySelector('.mobile-menu-overlay')) {
+            overlay.className = 'mobile-menu-overlay';
+            overlay.setAttribute('aria-hidden', 'true');
+            if (header && header.parentNode) {
+                header.parentNode.insertBefore(overlay, header.nextSibling);
+            } else {
+                document.body.appendChild(overlay);
+            }
+        }
+
+        mobileMenuBtn.setAttribute('role', 'button');
+        mobileMenuBtn.setAttribute('tabindex', '0');
+        mobileMenuBtn.setAttribute('aria-controls', navId);
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        mobileMenuBtn.setAttribute('aria-label', 'Open navigation menu');
+
+        const menuOverlay = document.querySelector('.mobile-menu-overlay');
+
+        function setMenuState(isOpen) {
+            navMenu.classList.toggle('open', isOpen);
+            mobileMenuBtn.classList.toggle('active', isOpen);
+            document.body.classList.toggle('mobile-nav-open', isOpen);
+            mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+            mobileMenuBtn.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+            if (menuOverlay) {
+                menuOverlay.classList.toggle('is-visible', isOpen);
+                menuOverlay.setAttribute('aria-hidden', String(!isOpen));
+            }
+        }
+
+        function closeMenu() {
+            setMenuState(false);
+        }
+
+        function toggleMenu() {
+            setMenuState(!navMenu.classList.contains('open'));
+        }
+
         mobileMenuBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            navMenu.classList.toggle('open');
-            mobileMenuBtn.classList.toggle('active');
+            toggleMenu();
         });
 
+        mobileMenuBtn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleMenu();
+            }
+        });
+
+        const activeCloseBtn = navMenu.querySelector('.mobile-menu-close');
+        if (activeCloseBtn) {
+            activeCloseBtn.addEventListener('click', closeMenu);
+        }
+
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', closeMenu);
+        }
+
         // Close menu when a nav link is clicked
-        const navLinks = document.querySelectorAll('.nav-links a');
+        const navLinks = navMenu.querySelectorAll('a');
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
-                navMenu.classList.remove('open');
-                mobileMenuBtn.classList.remove('active');
+                closeMenu();
             });
         });
 
         // Close menu when clicking outside
         document.addEventListener('click', function(e) {
-            const isClickInsideNav = e.target.closest('.navbar') || e.target.closest('.mobile-menu');
+            const isClickInsideNav = e.target.closest('.navbar') || e.target.closest('.mobile-menu') || e.target.closest('.nav-links');
             if (!isClickInsideNav && navMenu.classList.contains('open')) {
-                navMenu.classList.remove('open');
-                mobileMenuBtn.classList.remove('active');
+                closeMenu();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navMenu.classList.contains('open')) {
+                closeMenu();
+                mobileMenuBtn.focus();
             }
         });
 
         // Close menu on window resize (if resizing to desktop)
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768) {
-                navMenu.classList.remove('open');
-                mobileMenuBtn.classList.remove('active');
+                closeMenu();
             }
         });
     }
@@ -579,20 +730,52 @@ document.addEventListener('DOMContentLoaded', function() {
             transitionToSlide(nextIndex);
         }
 
+        function prevSlide() {
+            const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+            transitionToSlide(prevIndex);
+        }
+
+        let carouselInterval = null;
+
+        function startCarouselAutoplay() {
+            if (carouselInterval) clearInterval(carouselInterval);
+            carouselInterval = setInterval(nextSlide, 3500);
+        }
+
+        function stopCarouselAutoplay() {
+            if (carouselInterval) clearInterval(carouselInterval);
+            carouselInterval = null;
+        }
+
         // Initialize first slide with active class
         slides[0].classList.add('active');
         updateIndicators(0);
 
         // Auto-play carousel every 3.5 seconds
-        setInterval(nextSlide, 3500);
+        startCarouselAutoplay();
 
         // Allow clicking on indicators to navigate
         indicators.forEach((indicator, index) => {
             indicator.addEventListener('click', () => {
                 if (currentSlide !== index && !isAnimating) {
+                    stopCarouselAutoplay();
                     transitionToSlide(index);
+                    startCarouselAutoplay();
                 }
             });
+        });
+
+        addSwipeNavigation(carouselContainer, {
+            next: () => {
+                stopCarouselAutoplay();
+                nextSlide();
+            },
+            prev: () => {
+                stopCarouselAutoplay();
+                prevSlide();
+            },
+            pause: stopCarouselAutoplay,
+            resume: startCarouselAutoplay
         });
     }
 
@@ -1098,16 +1281,8 @@ function initializeCarousels() {
   let autoplayTimer = null;
   const AUTOPLAY_INTERVAL = 3000; // 3 seconds
   const TOTAL_CARDS = cards.length;
-  const CARD_WIDTH = 100 / 3; // 3 cards per view on desktop
-  
-  // Calculate translate amount based on viewport
-  function getCardWidth() {
-    const containerWidth = track.parentElement.offsetWidth;
-    const gapCount = 2; // 2 gaps between 3 cards
-    const gap = 30;
-    const totalGap = gapCount * gap;
-    return (containerWidth - totalGap) / 3;
-  }
+  const sliderViewport = track.parentElement;
+  if (window.innerWidth <= 768) currentIndex = 0;
   
   // Update slider position and card states
   function updateSlider() {
@@ -1120,10 +1295,13 @@ function initializeCarousels() {
       cards[currentIndex].classList.add('active');
     }
     
-    // Calculate transform: show 3 cards with current in center
-    // For infinite loop: show [prev, current, next] cards
-    const offset = -((currentIndex - 1) * (CARD_WIDTH + 2.5)) + '%';
-    track.style.transform = `translateX(${offset})`;
+    const activeCard = cards[currentIndex];
+    const maxOffset = Math.max(0, track.scrollWidth - sliderViewport.clientWidth);
+    const centeredOffset = activeCard
+      ? activeCard.offsetLeft - ((sliderViewport.clientWidth - activeCard.offsetWidth) / 2)
+      : 0;
+    const offset = Math.max(0, Math.min(centeredOffset, maxOffset));
+    track.style.transform = `translate3d(${-offset}px, 0, 0)`;
   }
   
   // Move to next card
@@ -1150,6 +1328,7 @@ function initializeCarousels() {
   
   function stopAutoplay() {
     if (autoplayTimer) clearInterval(autoplayTimer);
+    autoplayTimer = null;
   }
   
   function resetAutoplay() {
@@ -1172,7 +1351,15 @@ function initializeCarousels() {
   
   // Handle window resize
   window.addEventListener('resize', () => {
+    if (window.innerWidth <= 768 && currentIndex > TOTAL_CARDS - 1) currentIndex = 0;
     updateSlider();
+  });
+
+  addSwipeNavigation(sliderViewport, {
+    next: nextCard,
+    prev: prevCard,
+    pause: stopAutoplay,
+    resume: startAutoplay
   });
   
   // Initialize
@@ -1917,36 +2104,59 @@ if ('IntersectionObserver' in window) {
     
     // Auto-advance carousel every 4 seconds
     let carouselInterval = setInterval(nextSlide, 4000);
+
+    function stopGalleryAutoplay() {
+        clearInterval(carouselInterval);
+    }
+
+    function startGalleryAutoplay() {
+        clearInterval(carouselInterval);
+        carouselInterval = setInterval(nextSlide, 4000);
+    }
     
     // Pause on hover
     wrapper.addEventListener('mouseenter', () => {
-        clearInterval(carouselInterval);
+        stopGalleryAutoplay();
     });
     
     wrapper.addEventListener('mouseleave', () => {
-        carouselInterval = setInterval(nextSlide, 4000);
+        startGalleryAutoplay();
     });
     
     // Add click handlers to indicators
     indicators.forEach((indicator, index) => {
         indicator.addEventListener('click', () => {
-            clearInterval(carouselInterval);
+            stopGalleryAutoplay();
             goToSlide(index);
-            carouselInterval = setInterval(nextSlide, 4000);
+            startGalleryAutoplay();
         });
+    });
+
+    addSwipeNavigation(wrapper, {
+        next: () => {
+            stopGalleryAutoplay();
+            nextSlide();
+        },
+        prev: () => {
+            stopGalleryAutoplay();
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            showSlide(currentIndex);
+        },
+        pause: stopGalleryAutoplay,
+        resume: startGalleryAutoplay
     });
     
     // Add keyboard navigation
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') {
-            clearInterval(carouselInterval);
+            stopGalleryAutoplay();
             currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
             showSlide(currentIndex);
-            carouselInterval = setInterval(nextSlide, 4000);
+            startGalleryAutoplay();
         } else if (e.key === 'ArrowRight') {
-            clearInterval(carouselInterval);
+            stopGalleryAutoplay();
             nextSlide();
-            carouselInterval = setInterval(nextSlide, 4000);
+            startGalleryAutoplay();
         }
     });
 })();
@@ -1985,20 +2195,47 @@ if ('IntersectionObserver' in window) {
             currentIndex = (currentIndex + 1) % totalSlides;
             showSlide(currentIndex);
         }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            showSlide(currentIndex);
+        }
         
         // Show first slide
         showSlide(0);
         
         // Auto-advance every 4 seconds
         let sliderInterval = setInterval(nextSlide, slideDuration);
+
+        function stopSliderAutoplay() {
+            clearInterval(sliderInterval);
+        }
+
+        function startSliderAutoplay() {
+            clearInterval(sliderInterval);
+            sliderInterval = setInterval(nextSlide, slideDuration);
+        }
         
         // Pause on hover
         slider.addEventListener('mouseenter', () => {
-            clearInterval(sliderInterval);
+            stopSliderAutoplay();
         });
         
         slider.addEventListener('mouseleave', () => {
-            sliderInterval = setInterval(nextSlide, slideDuration);
+            startSliderAutoplay();
+        });
+
+        addSwipeNavigation(slider.querySelector('.slider-container') || slider, {
+            next: () => {
+                stopSliderAutoplay();
+                nextSlide();
+            },
+            prev: () => {
+                stopSliderAutoplay();
+                prevSlide();
+            },
+            pause: stopSliderAutoplay,
+            resume: startSliderAutoplay
         });
     }
 })();
@@ -2025,20 +2262,47 @@ if ('IntersectionObserver' in window) {
         currentIndex = (currentIndex + 1) % totalSlides;
         showSlide(currentIndex);
     }
+
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        showSlide(currentIndex);
+    }
     
     // Show first slide
     showSlide(0);
     
     // Auto-advance every 4 seconds
     let sliderInterval = setInterval(nextSlide, 4000);
+
+    function stopValuesAutoplay() {
+        clearInterval(sliderInterval);
+    }
+
+    function startValuesAutoplay() {
+        clearInterval(sliderInterval);
+        sliderInterval = setInterval(nextSlide, 4000);
+    }
     
     // Pause on hover
     valuesSlider.addEventListener('mouseenter', () => {
-        clearInterval(sliderInterval);
+        stopValuesAutoplay();
     });
     
     valuesSlider.addEventListener('mouseleave', () => {
-        sliderInterval = setInterval(nextSlide, 4000);
+        startValuesAutoplay();
+    });
+
+    addSwipeNavigation(valuesSlider.querySelector('.slider-container') || valuesSlider, {
+        next: () => {
+            stopValuesAutoplay();
+            nextSlide();
+        },
+        prev: () => {
+            stopValuesAutoplay();
+            prevSlide();
+        },
+        pause: stopValuesAutoplay,
+        resume: startValuesAutoplay
     });
 })();
 
@@ -2240,28 +2504,62 @@ if ('IntersectionObserver' in window) {
         }, 900);
     }
 
+    function showImageDirect(nextIndex) {
+        images.forEach((image) => {
+            image.classList.remove('active');
+        });
+
+        images[nextIndex].classList.add('active');
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === nextIndex);
+        });
+        currentIndex = nextIndex;
+        transitionIndex = (transitionIndex + 1) % transitionTypes.length;
+    }
+
+    function stopServicesHeroAutoplay() {
+        clearInterval(carouselInterval);
+    }
+
+    function startServicesHeroAutoplay() {
+        clearInterval(carouselInterval);
+        carouselInterval = setInterval(cycleImages, 3000);
+    }
+
     // Add dot click handlers
     dots.forEach((dot, idx) => {
         dot.addEventListener('click', () => {
-            clearInterval(carouselInterval);
-            currentIndex = (idx - 1 + images.length) % images.length;
-            cycleImages();
-            carouselInterval = setInterval(cycleImages, 3000);
+            stopServicesHeroAutoplay();
+            showImageDirect(idx);
+            startServicesHeroAutoplay();
         });
     });
 
     // Start auto-cycle after page load
     window.addEventListener('load', () => {
-        carouselInterval = setInterval(cycleImages, 3000);
+        startServicesHeroAutoplay();
     }, { once: true });
     
     // Pause carousel on hover
     servicesHeroSection.addEventListener('mouseenter', () => {
-        clearInterval(carouselInterval);
+        stopServicesHeroAutoplay();
     });
     
     servicesHeroSection.addEventListener('mouseleave', () => {
-        carouselInterval = setInterval(cycleImages, 3000);
+        startServicesHeroAutoplay();
+    });
+
+    addSwipeNavigation(servicesHeroSection, {
+        next: () => {
+            stopServicesHeroAutoplay();
+            cycleImages();
+        },
+        prev: () => {
+            stopServicesHeroAutoplay();
+            showImageDirect((currentIndex - 1 + images.length) % images.length);
+        },
+        pause: stopServicesHeroAutoplay,
+        resume: startServicesHeroAutoplay
     });
 })();
 
