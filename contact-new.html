@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Contact Us | JOEL INVESTMENT, TRADE AND RESOURCES LTD.</title>
+
+<meta name="description"
+content="Contact JOEL INVESTMENT, TRADE AND RESOURCES LTD. for investment advisory, trade facilitation, resource brokerage, project financing support, and business consultancy services in Ghana and across Africa.">
+
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  emailjs.init("YOUR_PUBLIC_KEY"); <!-- REPLACE WITH YOUR EMAILJS PUBLIC KEY -->
+</script>
+
+<!-- Canonical Tag -->
+<link rel="canonical" href="https://www.yourdomain.com/contact.html">
+
+<!-- Open Graph Tags -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Contact Us - JOEL INVESTMENT">
+<meta property="og:description" content="Get in touch with JOEL Investment for investment advisory and trade solutions.">
+<meta property="og:image" content="https://www.yourdomain.com/assets/images/logo/joel_investment_logo.jpeg">
+<meta property="og:url" content="https://www.yourdomain.com/contact.html">
+
+<!-- Twitter/X Cards -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Contact JOEL INVESTMENT">
+<meta name="twitter:description" content="Reach out to our team for business solutions.">
+<meta name="twitter:image" content="https://www.yourdomain.com/assets/images/logo/joel_investment_logo.jpeg">
+
+<!-- Organization Schema Markup -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "JOEL INVESTMENT, TRADE AND RESOURCES LTD.",
+  "url": "https://www.yourdomain.com",
+  "logo": "https://www.yourdomain.com/assets/images/logo/joel_investment_logo.jpeg",
+  "email": "joelinvestmentltd@gmail.com",
+  "telephone": "+233 54 622 3968",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "14 Anyame Street",
+    "addressLocality": "Abuja",
+    "addressCountry": "Nigeria"
+  },
+  "founder": {
+    "@type": "Person",
+    "name": "Okafor C. Arinze"
+  },
+  "description": "Investment advisory, trade facilitation, financial consultancy, resource brokerage, project financing, and strategic partnerships."
+}
+</script>
+
+<style>
+/* ===== CONTACT HERO SECTION ===== */
+.contact-hero {
+  width: 100%;
+  min-height: 88vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.contact-hero-left {
+  width: 52%;
+  min-height: 88vh;
+  clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+  z-index: 2;
+  overflow: hidden;
+  position: relative;
+  background: #040f2e;
+  display: flex;
+  flex-direction: column;
+  animation: slideFromRight 1s ease-out 0.1s both;
+}
+
+.contact-hero-left::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent 60%, rgba(4,23,94,0.6) 100%);
+  z-index: 3;
+}
+
+.contact-video-panel {
+  width: 100%;
+  height: 60%;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.contact-video-panel video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.video-control-btn {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 4;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f0a500;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.video-control-btn:hover {
+  background: #d4920a;
+  transform: scale(1.1);
+}
+
+.video-duration {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 4;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.contact-images-strip {
+  width: 100%;
+  height: 40%;
+  position: relative;
+  overflow: hidden;
+  background: #040f2e;
+}
+
+.contact-images-strip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  position: absolute;
+  opacity: 0;
+}
+
+.contact-images-strip img.active {
+  opacity: 1;
+}
+
+.contact-hero-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 52%;
+  min-height: 88vh;
+  clip-path: polygon(12% 0, 100% 0, 100% 100%, 0% 100%);
+  z-index: 1;
+  background: linear-gradient(135deg, #04175e 0%, #0a4fa6 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 60px 60px 80px;
+  animation: slideFromLeft 1s ease-out 0.2s both;
+}
+
+.contact-hero-right-label {
+  color: #f0a500;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 16px;
+}
+
+.contact-hero-right h1 {
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: white;
+  line-height: 1.2;
+  max-width: 480px;
+  margin: 0 0 16px 0;
+}
+
+.contact-hero-right-subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.75;
+  max-width: 440px;
+  margin: 0 0 28px 0;
+}
+
+.contact-info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.contact-info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.contact-info-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(240,165,0,0.18);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f0a500;
+  font-size: 0.9rem;
+}
+
+.contact-info-text {
+  color: white;
+  font-size: 0.95rem;
+}
+
+.contact-info-text.secondary {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.9rem;
+}
+
+.contact-hero-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.contact-hero-btn {
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: inline-block;
+}
+
+.contact-hero-btn-primary {
+  background: #f0a500;
+  color: #04175e;
+}
+
+.contact-hero-btn-primary:hover {
+  background: #d4920a;
+  transform: translateY(-3px);
+}
+
+.contact-hero-btn-secondary {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+}
+
+.contact-hero-btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-3px);
+}
+
+.contact-hero-accent {
+  width: 60px;
+  height: 4px;
+  background: #f0a500;
+  border-radius: 2px;
+}
+
+@keyframes slideFromRight {
+  from { transform: translateX(80px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideFromLeft {
+  from { transform: translateX(-80px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== CONTACT FORM SECTION ===== */
+.contact-form-section {
+  background: #f4f6fb;
+  padding: 80px 60px;
+  width: 100%;
+}
+
+.contact-form-container {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+.contact-info-panel {
+  background: linear-gradient(135deg, #04175e 0%, #0a4fa6 100%);
+  border-radius: 20px;
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-info-panel-label {
+  color: #f0a500;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+
+.contact-info-panel h3 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 8px 0;
+}
+
+.contact-info-panel-subtitle {
+  color: rgba(255,255,255,0.78);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  margin-bottom: 36px;
+}
+
+.contact-block {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.contact-block-icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(240,165,0,0.18);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f0a500;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.contact-block-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-block-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.contact-block-value {
+  font-size: 0.92rem;
+  color: white;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.contact-social-links {
+  display: flex;
+  gap: 10px;
+  margin-top: 28px;
+  margin-bottom: 28px;
+}
+
+.contact-social-link {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.82rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.contact-social-link:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.4);
+}
+
+.contact-whatsapp-btn {
+  width: 100%;
+  background: #25D366;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 24px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  margin-top: auto;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+}
+
+.contact-whatsapp-btn:hover {
+  background: #1e9d56;
+  transform: translateY(-2px);
+}
+
+.contact-form-panel {
+  background: white;
+  border-radius: 20px;
+  padding: 48px 40px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+}
+
+.contact-form-panel-label {
+  color: #f0a500;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+
+.contact-form-panel h3 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0d2d6b;
+  margin: 0 0 28px 0;
+}
+
+.contact-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.contact-form-full {
+  grid-column: 1 / -1;
+}
+
+.contact-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0d2d6b;
+  margin-bottom: 6px;
+}
+
+.contact-form-group input,
+.contact-form-group select,
+.contact-form-group textarea {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition: all 0.25s;
+}
+
+.contact-form-group input:focus,
+.contact-form-group select:focus,
+.contact-form-group textarea:focus {
+  outline: none;
+  border-color: #0a4fa6;
+  box-shadow: 0 0 0 3px rgba(10,79,166,0.1);
+}
+
+.contact-form-group textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.contact-form-group select {
+  cursor: pointer;
+}
+
+.contact-submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #0a4fa6, #083d85);
+  color: white;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+}
+
+.contact-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(10,79,166,0.3);
+}
+
+.contact-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.form-success-msg,
+.form-error-msg {
+  text-align: center;
+  padding: 48px 32px;
+  border-radius: 16px;
+  margin: 24px 0;
+  display: none;
+}
+
+.form-success-msg {
+  background: #f0fdf4;
+  border: 2px solid #22c55e;
+}
+
+.form-error-msg {
+  background: #fff1f2;
+  border: 2px solid #ef4444;
+}
+
+.fsm-icon {
+  font-size: 2.8rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.fsm-inner h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0d2d6b;
+  margin-bottom: 10px;
+}
+
+.fsm-inner.error h3 {
+  color: #b91c1c;
+}
+
+.fsm-inner p {
+  font-size: 0.92rem;
+  color: #555;
+  line-height: 1.65;
+}
+
+.fsm-back-btn {
+  margin-top: 20px;
+  background: #0a4fa6;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.fsm-back-btn:hover {
+  background: #083d85;
+}
+
+/* ===== MAP SECTION ===== */
+.map-section {
+  background: white;
+  padding: 60px;
+  width: 100%;
+}
+
+.map-container {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+  min-height: 400px;
+}
+
+.map-info-panel {
+  background: #0d2d6b;
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.map-info-label {
+  color: #f0a500;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+
+.map-info-heading {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 28px;
+}
+
+.map-info-block {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.map-info-block-icon {
+  flex-shrink: 0;
+  color: #f0a500;
+}
+
+.map-directions-btn {
+  background: #f0a500;
+  color: #0d2d6b;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 28px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.map-directions-btn:hover {
+  background: #d4920a;
+  transform: translateY(-2px);
+}
+
+.map-iframe-container {
+  width: 100%;
+  height: 100%;
+}
+
+.map-iframe-container iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="container">
+        <div class="top-left">
+            <span><i class="fa-solid fa-phone"></i> +233 54 622 3968</span>
+            <span><i class="fa-solid fa-envelope"></i> joelinvestmentltd@gmail.com</span>
+        </div>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="header">
+    <div class="container nav-container">
+        <a href="index.html" class="logo">
+            <img src="assets/images/logo/joel_investment_logo2.jpeg" alt="JOEL Investment Logo">
+        </a>
+        <nav class="navbar">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="leadership.html">Leadership</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</header>
+
+<!-- PROMPT 1: CONTACT HERO SECTION -->
+<section class="contact-hero">
+  <div class="contact-hero-left">
+    <!-- Video Panel -->
+    <div class="contact-video-panel">
+      <video id="contactVideo" poster="assets/images/about-preview3.jpg" autoplay muted loop playsinline>
+        <source src="assets/videos/company-intro.mp4" type="video/mp4">
+      </video>
+      <button class="video-control-btn" id="videoPlayPauseBtn">▶</button>
+      <div class="video-duration">0:30</div>
+    </div>
+
+    <!-- Images Strip -->
+    <div class="contact-images-strip" id="contactImagesStrip">
+      <img src="assets/images/about-preview.jpg" alt="Portfolio 1" class="active">
+      <img src="assets/images/about-preview1.jpg" alt="Portfolio 2">
+      <img src="assets/images/about-preview2.jpg" alt="Portfolio 3">
+      <img src="assets/images/about-preview4.jpg" alt="Portfolio 4">
+    </div>
+  </div>
+
+  <!-- Right Half - Text Content -->
+  <div class="contact-hero-right">
+    <div class="contact-hero-right-label">Get In Touch</div>
+    <h1>Let's Discuss Your Next Opportunity</h1>
+    <p class="contact-hero-right-subtitle">
+      Connect with our expert team to explore investment opportunities, trade partnerships, and strategic business solutions tailored to your goals.
+    </p>
+
+    <!-- Contact Info -->
+    <div class="contact-info-rows">
+      <div class="contact-info-row">
+        <div class="contact-info-icon">📞</div>
+        <div class="contact-info-text">+233 54 622 3968</div>
+      </div>
+      <div class="contact-info-row">
+        <div class="contact-info-icon">✉️</div>
+        <div class="contact-info-text">joelinvestmentltd@gmail.com</div>
+      </div>
+      <div class="contact-info-row">
+        <div class="contact-info-icon">📍</div>
+        <div class="contact-info-text secondary">14 Anyame Street, Abuja, Nigeria</div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="contact-hero-buttons">
+      <button class="contact-hero-btn contact-hero-btn-primary" onclick="document.querySelector('.contact-form-section').scrollIntoView({behavior: 'smooth'})">Send Us A Message</button>
+      <a href="https://wa.me/233546223968" target="_blank" class="contact-hero-btn contact-hero-btn-secondary">Chat On WhatsApp</a>
+    </div>
+
+    <div class="contact-hero-accent"></div>
+  </div>
+</section>
+
+<!-- PROMPT 3: CONTACT FORM + INFO SECTION -->
+<section class="contact-form-section" id="contactFormSection">
+  <div class="contact-form-container">
+    <!-- Left Panel - Contact Information -->
+    <div class="contact-info-panel">
+      <p class="contact-info-panel-label">Contact Information</p>
+      <h3>We'd Love To Hear From You</h3>
+      <p class="contact-info-panel-subtitle">Reach out through any channel below and our team will respond within 24 hours.</p>
+
+      <!-- Contact Blocks -->
+      <div class="contact-block">
+        <div class="contact-block-icon">📞</div>
+        <div class="contact-block-content">
+          <div class="contact-block-label">Phone Number</div>
+          <div class="contact-block-value">+233 54 622 3968</div>
+        </div>
+      </div>
+
+      <div class="contact-block">
+        <div class="contact-block-icon">✉️</div>
+        <div class="contact-block-content">
+          <div class="contact-block-label">Email Address</div>
+          <div class="contact-block-value">joelinvestmentltd@gmail.com</div>
+        </div>
+      </div>
+
+      <div class="contact-block">
+        <div class="contact-block-icon">📍</div>
+        <div class="contact-block-content">
+          <div class="contact-block-label">Africa Head Offices</div>
+          <div class="contact-block-value">14 Anyame Street, Abuja, Nigeria</div>
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div class="contact-social-links">
+        <a href="https://www.linkedin.com/in/arinze-okafor-2b15241a3?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="contact-social-link">LinkedIn</a>
+        <a href="https://www.facebook.com/profile.php?id=61589858708679" target="_blank" class="contact-social-link">Facebook</a>
+        <a href="https://twitter.com/joelinvestment" target="_blank" class="contact-social-link">Twitter</a>
+      </div>
+
+      <!-- WhatsApp Button -->
+      <a href="https://wa.me/233546223968" target="_blank" class="contact-whatsapp-btn">💬 Chat On WhatsApp</a>
+    </div>
+
+    <!-- Right Panel - Form -->
+    <div class="contact-form-panel">
+      <p class="contact-form-panel-label">Send Us A Message</p>
+      <h3>Request A Consultation</h3>
+
+      <!-- EMAILJS SETUP REQUIRED: See comment at end of this form -->
+      <form id="consultationForm">
+        <div class="contact-form-grid">
+          <div class="contact-form-group">
+            <label>Full Name</label>
+            <input type="text" name="from_name" required>
+          </div>
+          <div class="contact-form-group">
+            <label>Email Address</label>
+            <input type="email" name="from_email" required>
+          </div>
+        </div>
+
+        <div class="contact-form-grid">
+          <div class="contact-form-group">
+            <label>Phone Number</label>
+            <input type="text" name="phone">
+          </div>
+          <div class="contact-form-group">
+            <label>Service Required</label>
+            <select name="service" required>
+              <option value="">Select a service...</option>
+              <option value="Investment Advisory">Investment Advisory</option>
+              <option value="Financial Consultancy">Financial Consultancy</option>
+              <option value="International Trade Facilitation">International Trade Facilitation</option>
+              <option value="Mineral Resource Brokerage">Mineral Resource Brokerage</option>
+              <option value="Business Development">Business Development</option>
+              <option value="Corporate Representation">Corporate Representation</option>
+              <option value="Strategic Partnerships">Strategic Partnerships</option>
+              <option value="Project Financing Support">Project Financing Support</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="contact-form-grid contact-form-full">
+          <div class="contact-form-group">
+            <label>Message</label>
+            <textarea name="message" required></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="contact-submit-btn" id="contactSubmitBtn">
+          <span class="btn-text">Send Message</span>
+          <span class="btn-loader" style="display:none">Sending...</span>
+        </button>
+      </form>
+
+      <!-- Success Message -->
+      <div class="form-success-msg" id="formSuccessMsg">
+        <div class="fsm-inner">
+          <span class="fsm-icon">✅</span>
+          <h3>Enquiry Successfully Sent!</h3>
+          <p>Thank you for reaching out. Our team will respond to your message within 24 hours.</p>
+          <button class="fsm-back-btn" id="fsmBackBtn">Send Another Message</button>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div class="form-error-msg" id="formErrorMsg">
+        <div class="fsm-inner error">
+          <span class="fsm-icon">❌</span>
+          <h3>Sending Failed</h3>
+          <p>Something went wrong. Please try again or contact us directly at joelinvestmentltd@gmail.com</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAILJS SETUP REQUIRED:
+    1. Go to https://www.emailjs.com and create a free account
+    2. Add an Email Service (connect Gmail: joelinvestmentltd@gmail.com)
+    3. Create an Email Template with these variables:
+       {{from_name}}, {{from_email}}, {{phone}}, {{service}}, {{message}}
+       Set "To Email" as: joelinvestmentltd@gmail.com
+    4. Replace YOUR_PUBLIC_KEY in <head> with your EmailJS Public Key
+    5. Replace YOUR_SERVICE_ID below with your Service ID
+    6. Replace YOUR_TEMPLATE_ID below with your Template ID
+    All IDs are found in your EmailJS dashboard at emailjs.com
+  -->
+</section>
+
+<!-- PROMPT 3: MAP SECTION -->
+<section class="map-section">
+  <div class="map-container">
+    <!-- Left - Map Info -->
+    <div class="map-info-panel">
+      <p class="map-info-label">Location</p>
+      <h2 class="map-info-heading">Our Office</h2>
+
+      <div class="map-info-block">
+        <span class="map-info-block-icon">📍</span>
+        <span>14 Anyame Street, Abuja, Nigeria</span>
+      </div>
+
+      <div class="map-info-block">
+        <span class="map-info-block-icon">🕐</span>
+        <span>Monday – Friday: 9:00 AM – 5:00 PM GMT</span>
+      </div>
+
+      <div class="map-info-block">
+        <span class="map-info-block-icon">✉️</span>
+        <span>joelinvestmentltd@gmail.com</span>
+      </div>
+
+      <a href="https://maps.google.com/maps?q=14+Anyame+Street+Abuja+Nigeria" target="_blank" class="map-directions-btn">Get Directions</a>
+    </div>
+
+    <!-- Right - Map Embed -->
+    <div class="map-iframe-container">
+      <iframe src="https://maps.google.com/maps?q=14+Anyame+Street+Abuja+Nigeria&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-section">
+                <img src="assets/images/logo/joel_investment_logo3.jpeg" class="footer-logo" alt="JOEL Investment Logo">
+                <p>Connecting Opportunities, Creating Prosperity</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="services.html#investment">Investment Advisory</a></li>
+                    <li><a href="services.html#trade">Trade Facilitation</a></li>
+                    <li><a href="services.html#resources">Resource Brokerage</a></li>
+                    <li><a href="services.html#financing">Project Financing</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About JOEL Investment</a></li>
+                    <li><a href="leadership.html">Leadership</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Connect With Us</h4>
+                <ul class="social-links">
+                    <li><a href="https://www.linkedin.com/in/arinze-okafor-2b15241a3?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank">LinkedIn</a></li>
+                    <li><a href="https://www.facebook.com/profile.php?id=61589858708679" target="_blank">Facebook</a></li>
+                    <li><a href="https://twitter.com/joelinvestment" target="_blank">Twitter</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-newsletter">
+            <h4>Subscribe to Our Newsletter</h4>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Your email address" required>
+                <button type="submit" class="btn btn-primary">Subscribe</button>
+            </form>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 JOEL Investment, Trade and Resources Ltd. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+
+<script>
+// Contact Hero Video Controls
+(function initContactVideo() {
+  const video = document.getElementById('contactVideo');
+  const playPauseBtn = document.getElementById('videoPlayPauseBtn');
+  
+  if (!video || !playPauseBtn) return;
+
+  function updatePlayPauseButton() {
+    playPauseBtn.innerHTML = video.paused ? '▶' : '⏸';
+  }
+
+  playPauseBtn.addEventListener('click', () => {
+    if (video.paused) {
+      video.play();
+    } else {
+      video.pause();
+    }
+    updatePlayPauseButton();
+  });
+
+  video.addEventListener('play', updatePlayPauseButton);
+  video.addEventListener('pause', updatePlayPauseButton);
+})();
+
+// Contact Hero Images Strip - Auto-sliding with transitions
+(function initContactImages() {
+  const imagesStrip = document.getElementById('contactImagesStrip');
+  if (!imagesStrip) return;
+
+  const images = imagesStrip.querySelectorAll('img');
+  if (images.length === 0) return;
+
+  let currentIndex = 0;
+  const transitions = ['slideIn', 'zoomIn', 'flipIn', 'fadeInImg'];
+
+  // Add animations to style
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes flipIn {
+      from { transform: rotateY(90deg); opacity: 0; }
+      to { transform: rotateY(0); opacity: 1; }
+    }
+    @keyframes fadeInImg {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  function showImage(index, transitionType) {
+    images.forEach((img, i) => {
+      img.classList.remove('active');
+      img.style.animation = 'none';
+    });
+
+    const img = images[index];
+    
+    setTimeout(() => {
+      img.style.animation = `${transitionType} 0.6s ease-out forwards`;
+      img.classList.add('active');
+    }, 10);
+  }
+
+  function nextImage() {
+    const transitionType = transitions[currentIndex % transitions.length];
+    showImage(currentIndex, transitionType);
+    currentIndex = (currentIndex + 1) % images.length;
+  }
+
+  setInterval(nextImage, 2500);
+})();
+
+// Contact Form - EmailJS Integration
+(function initContactForm() {
+  const consultForm = document.getElementById('consultationForm');
+  if (!consultForm) return;
+
+  consultForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('contactSubmitBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoader = submitBtn.querySelector('.btn-loader');
+
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'inline';
+    submitBtn.disabled = true;
+
+    const templateParams = {
+      from_name: consultForm.from_name.value,
+      from_email: consultForm.from_email.value,
+      phone: consultForm.querySelector('#fullPhoneNumber')?.value || '',
+      service: consultForm.service.value,
+      message: consultForm.message.value,
+      to_email: 'joelinvestmentltd@gmail.com'
+    };
+
+    if (typeof emailjs !== 'undefined') {
+      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+        .then(function() {
+          consultForm.style.display = 'none';
+          document.getElementById('formSuccessMsg').style.display = 'block';
+          document.getElementById('formSuccessMsg').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        })
+        .catch(function(error) {
+          document.getElementById('formErrorMsg').style.display = 'block';
+          btnText.style.display = 'inline';
+          btnLoader.style.display = 'none';
+          submitBtn.disabled = false;
+          console.error('EmailJS error:', error);
+        });
+    } else {
+      console.error('EmailJS not loaded');
+      document.getElementById('formErrorMsg').style.display = 'block';
+      btnText.style.display = 'inline';
+      btnLoader.style.display = 'none';
+      submitBtn.disabled = false;
+    }
+  });
+
+  const backBtn = document.getElementById('fsmBackBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      consultForm.reset();
+      consultForm.style.display = 'block';
+      document.getElementById('formSuccessMsg').style.display = 'none';
+      document.getElementById('formErrorMsg').style.display = 'none';
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

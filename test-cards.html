@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Areas Test</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-card {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Business Areas Cards - Image Test</h1>
+    <p>Testing if images display correctly with hover effects</p>
+    
+    <div class="test-container">
+        <!-- Card 1 -->
+        <div class="business-card test-card">
+            <div class="card-image">
+                <img src="assets/images/services/mining.jpg" alt="Mining">
+                <div class="card-icon">⛏️</div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-industry">Mining & Natural Resources</h3>
+                <p class="card-text">Direct access to premium mineral resources with verified sourcing.</p>
+                <a href="#" class="card-btn">Learn More →</a>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="business-card test-card">
+            <div class="card-image">
+                <img src="assets/images/services/agriculture.jpg" alt="Agriculture">
+                <div class="card-icon">🌾</div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-industry">Agriculture</h3>
+                <p class="card-text">Strategic agricultural partnerships connecting producers with international buyers.</p>
+                <a href="#" class="card-btn">Learn More →</a>
+            </div>
+        </div>
+
+        <!-- Card 3 (Active) -->
+        <div class="business-card active test-card">
+            <div class="card-image">
+                <img src="assets/images/services/manufacturing.jpg" alt="Manufacturing">
+                <div class="card-icon">🏭</div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-industry">Manufacturing</h3>
+                <p class="card-text">End-to-end manufacturing solutions from supply chain optimization.</p>
+                <a href="#" class="card-btn">Learn More →</a>
+            </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="business-card test-card">
+            <div class="card-image">
+                <img src="assets/images/services/trade.jpg" alt="Trade">
+                <div class="card-icon">🌍</div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-industry">International Trade</h3>
+                <p class="card-text">Comprehensive trade facilitation connecting businesses with global markets.</p>
+                <a href="#" class="card-btn">Learn More →</a>
+            </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="business-card test-card">
+            <div class="card-image">
+                <img src="assets/images/services/finance.jpg" alt="Finance">
+                <div class="card-icon">💰</div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-industry">Financial Services</h3>
+                <p class="card-text">Strategic financial planning and analysis for growth.</p>
+                <a href="#" class="card-btn">Learn More →</a>
+            </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="business-card test-card">
+            <div class="card-image">
+                <img src="assets/images/services/infrastructure.jpg" alt="Infrastructure">
+                <div class="card-icon">🏗️</div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-industry">Infrastructure Projects</h3>
+                <p class="card-text">Development and financing of large-scale infrastructure projects.</p>
+                <a href="#" class="card-btn">Learn More →</a>
+            </div>
+        </div>
+    </div>
+
+    <h2 style="margin-top: 60px;">✓ Test Checklist</h2>
+    <ul>
+        <li>✓ Images display correctly in each card</li>
+        <li>✓ Card icons appear as overlays in bottom-left corner</li>
+        <li>✓ Icons have dark semi-transparent background</li>
+        <li>✓ Hover effect: Image zooms slightly (scale 1.06)</li>
+        <li>✓ Active card has larger scale and gold border</li>
+        <li>✓ Bottom white section with title, text, and link displays</li>
+        <li>✓ All rounded corners visible on top of cards</li>
+    </ul>
+</body>
+</html>
