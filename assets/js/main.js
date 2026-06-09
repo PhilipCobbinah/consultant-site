@@ -295,87 +295,6 @@ function addSwipeNavigation(element, handlers = {}, options = {}) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // === CLEAN MOBILE MENU IMPLEMENTATION ===
-    (function() {
-      // Find hamburger button and nav menu using multiple possible class names
-      const hamburger = document.querySelector(
-        '.hamburger, .menu-toggle, .nav-toggle, .burger, [class*="hamburger"], [class*="menu-btn"], [class*="toggle-btn"], .mobile-menu'
-      );
-      const navMenu = document.querySelector(
-        '.nav-links, .nav-menu, [class*="nav-links"], [class*="nav-menu"]'
-      );
-      const closeBtn = document.querySelector(
-        '.nav-close, .menu-close, [class*="nav-close"], [class*="close-btn"], .mobile-menu-close'
-      );
-
-      if (!hamburger || !navMenu) return;
-
-      function openMenu() {
-        navMenu.classList.add('active');
-        navMenu.classList.add('open');
-        document.body.classList.add('menu-open');
-        if (hamburger) hamburger.setAttribute('aria-expanded', 'true');
-      }
-
-      function closeMenu() {
-        navMenu.classList.remove('active');
-        navMenu.classList.remove('open');
-        document.body.classList.remove('menu-open');
-        if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
-      }
-
-      // Hamburger click — toggle menu
-      hamburger.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const isOpen = navMenu.classList.contains('active');
-        if (isOpen) {
-          closeMenu();
-        } else {
-          openMenu();
-        }
-      });
-
-      // Close button click
-      if (closeBtn) {
-        closeBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          closeMenu();
-        });
-      }
-
-      // Close menu when a nav link is clicked
-      const navLinks = navMenu.querySelectorAll('a');
-      navLinks.forEach(function(link) {
-        link.addEventListener('click', function() {
-          closeMenu();
-        });
-      });
-
-      // Close menu when clicking outside
-      document.addEventListener('click', function(e) {
-        if (
-          navMenu.classList.contains('active') &&
-          !navMenu.contains(e.target) &&
-          !hamburger.contains(e.target)
-        ) {
-          closeMenu();
-        }
-      });
-
-      // Close menu on Escape key
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && navMenu.classList.contains('active')) {
-          closeMenu();
-        }
-      });
-
-      // Close menu on window resize (if resizing to desktop)
-      window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-          closeMenu();
-        }
-      });
-    })();
 
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -2814,7 +2733,121 @@ window.consultantWebsite = {
       // Scroll back to button
       setTimeout(() => {
         profileBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }
   });
+})();
+
+/* ========================================
+   MOBILE NAV — COMPLETE REBUILD
+   ======================================== */
+(function() {
+  'use strict';
+
+  function initMobileNav() {
+
+    // Find hamburger — try every possible selector
+    const hamburger =
+      document.querySelector('.hamburger') ||
+      document.querySelector('.menu-toggle') ||
+      document.querySelector('.nav-toggle') ||
+      document.querySelector('.burger') ||
+      document.querySelector('[data-toggle="menu"]') ||
+      document.querySelector('.mobile-menu-btn') ||
+      document.querySelector('button[aria-label*="menu" i]') ||
+      document.querySelector('button[aria-label*="navigation" i]') ||
+      document.querySelector('.mobile-menu');
+
+    // Find nav container — try every possible selector
+    const navContainer =
+      document.querySelector('.nav-list') ||
+      document.querySelector('.nav-links') ||
+      document.querySelector('.nav-menu') ||
+      document.querySelector('.navbar-nav') ||
+      document.querySelector('.menu-items') ||
+      document.querySelector('header ul') ||
+      document.querySelector('nav ul') ||
+      document.querySelector('nav > ul');
+
+    if (!hamburger) {
+      console.warn('Mobile nav: hamburger button not found');
+      return;
+    }
+    if (!navContainer) {
+      console.warn('Mobile nav: nav container not found');
+      return;
+    }
+
+    console.log('Mobile nav found:', hamburger, navContainer);
+
+    // Inject close button into nav container if not already there
+    if (!navContainer.querySelector('.mobile-nav-close')) {
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'mobile-nav-close';
+      closeBtn.innerHTML = '✕';
+      closeBtn.setAttribute('aria-label', 'Close menu');
+      closeBtn.setAttribute('type', 'button');
+      navContainer.appendChild(closeBtn);
+
+      closeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeNav();
+      });
+    }
+
+    function openNav() {
+      navContainer.classList.add('mobile-open');
+      document.body.style.overflow = 'hidden';
+      hamburger.setAttribute('aria-expanded', 'true');
+      console.log('Nav opened');
+    }
+
+    function closeNav() {
+      navContainer.classList.remove('mobile-open');
+      document.body.style.overflow = '';
+      hamburger.setAttribute('aria-expanded', 'false');
+      console.log('Nav closed');
+    }
+
+    // Hamburger click
+    hamburger.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (navContainer.classList.contains('mobile-open')) {
+        closeNav();
+      } else {
+        openNav();
+      }
+    });
+
+    // Close when nav link is clicked
+    const allLinks = navContainer.querySelectorAll('a');
+    allLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        closeNav();
+      });
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', function(e) {
+      if (
+        navContainer.classList.contains('mobile-open') &&
+        !navContainer.contains(e.target) &&
+        !hamburger.contains(e.target)
+      ) {
+        closeNav();
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeNav();
+    });
+  }
+
+  // Run on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileNav);
+  } else {
+    initMobileNav();
+  }
+
 })();

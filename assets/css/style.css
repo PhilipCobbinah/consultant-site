@@ -7867,3 +7867,113 @@ button {
         gap: 8px;
     }
 }
+
+/* ========================================
+   MOBILE NAV — FINAL FIX (add at bottom)
+   ======================================== */
+
+@media (max-width: 768px) {
+
+  /* Force all nav link containers hidden by default on mobile */
+  .nav-list,
+  .nav-links,
+  .nav-menu,
+  .navbar-nav,
+  .menu-items,
+  header ul,
+  nav ul {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* When JS adds .mobile-open class — SHOW ALL LINKS */
+  .nav-list.mobile-open,
+  .nav-links.mobile-open,
+  .nav-menu.mobile-open,
+  .navbar-nav.mobile-open,
+  .menu-items.mobile-open,
+  header ul.mobile-open,
+  nav ul.mobile-open {
+    display: flex !important;
+    flex-direction: column !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: all !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    background-color: #04175e !important;
+    z-index: 999999 !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding: 80px 32px 40px 32px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+    gap: 4px !important;
+  }
+
+  /* Every single link item inside */
+  .nav-list.mobile-open li,
+  .nav-links.mobile-open li,
+  .nav-menu.mobile-open li,
+  .navbar-nav.mobile-open li,
+  .menu-items.mobile-open li,
+  header ul.mobile-open li,
+  nav ul.mobile-open li {
+    display: block !important;
+    width: 100% !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+  }
+
+  /* Every anchor link */
+  .nav-list.mobile-open li a,
+  .nav-links.mobile-open li a,
+  .nav-menu.mobile-open li a,
+  .navbar-nav.mobile-open li a,
+  .menu-items.mobile-open li a,
+  header ul.mobile-open li a,
+  nav ul.mobile-open li a,
+  .nav-list.mobile-open a,
+  .nav-links.mobile-open a,
+  .nav-menu.mobile-open a {
+    display: block !important;
+    color: #ffffff !important;
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+    padding: 18px 0 !important;
+    text-decoration: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 100% !important;
+    background: transparent !important;
+  }
+
+  /* Close button inside open menu */
+  .mobile-nav-close {
+    position: fixed !important;
+    top: 18px !important;
+    right: 18px !important;
+    width: 48px !important;
+    height: 48px !important;
+    background: rgba(255,255,255,0.15) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    color: white !important;
+    font-size: 1.5rem !important;
+    cursor: pointer !important;
+    z-index: 9999999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
