@@ -211,6 +211,15 @@ img {
     padding: 1rem 0;
 }
 
+.nav-logo img,
+.logo img,
+header .logo img,
+nav .logo img {
+    max-height: 70px;
+    width: auto;
+    object-fit: contain;
+}
+
 .logo img {
     height: 100px;
     width: auto;
