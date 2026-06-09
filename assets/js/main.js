@@ -2742,112 +2742,173 @@ window.consultantWebsite = {
 (function() {
   'use strict';
 
-  function initMobileNav() {
+  // Wait for DOM
+  document.addEventListener('DOMContentLoaded', function() {
 
-    // Find hamburger — try every possible selector
-    const hamburger =
+    // ---- STEP A: Find hamburger and nav using the ACTUAL class names from the HTML ----
+    // Try every common pattern
+    const ham =
       document.querySelector('.hamburger') ||
       document.querySelector('.menu-toggle') ||
       document.querySelector('.nav-toggle') ||
       document.querySelector('.burger') ||
-      document.querySelector('[data-toggle="menu"]') ||
-      document.querySelector('.mobile-menu-btn') ||
-      document.querySelector('button[aria-label*="menu" i]') ||
-      document.querySelector('button[aria-label*="navigation" i]') ||
+      document.querySelector('[class*="hamburger"]') ||
+      document.querySelector('[class*="menu-toggle"]') ||
+      document.querySelector('[class*="nav-toggle"]') ||
+      document.querySelector('button[aria-label]') ||
+      document.querySelector('header button') ||
+      document.querySelector('nav button') ||
       document.querySelector('.mobile-menu');
 
-    // Find nav container — try every possible selector
-    const navContainer =
-      document.querySelector('.nav-list') ||
+    const nav =
       document.querySelector('.nav-links') ||
       document.querySelector('.nav-menu') ||
+      document.querySelector('.nav-list') ||
       document.querySelector('.navbar-nav') ||
-      document.querySelector('.menu-items') ||
+      document.querySelector('[class*="nav-links"]') ||
+      document.querySelector('[class*="nav-menu"]') ||
       document.querySelector('header ul') ||
       document.querySelector('nav ul') ||
-      document.querySelector('nav > ul');
+      document.querySelector('nav > ul') ||
+      document.querySelector('header nav ul');
 
-    if (!hamburger) {
-      console.warn('Mobile nav: hamburger button not found');
+    // Log what was found so we can debug
+    console.log('HAM:', ham ? ham.className : 'NOT FOUND');
+    console.log('NAV:', nav ? nav.className : 'NOT FOUND');
+
+    if (!ham || !nav) {
+      console.error('Hamburger or nav not found - check class names');
       return;
     }
-    if (!navContainer) {
-      console.warn('Mobile nav: nav container not found');
-      return;
-    }
 
-    console.log('Mobile nav found:', hamburger, navContainer);
+    // ---- STEP B: Remove old event listeners by cloning ----
+    const newHam = ham.cloneNode(true);
+    ham.parentNode.replaceChild(newHam, ham);
 
-    // Inject close button into nav container if not already there
-    if (!navContainer.querySelector('.mobile-nav-close')) {
-      const closeBtn = document.createElement('button');
-      closeBtn.className = 'mobile-nav-close';
-      closeBtn.innerHTML = '✕';
-      closeBtn.setAttribute('aria-label', 'Close menu');
-      closeBtn.setAttribute('type', 'button');
-      navContainer.appendChild(closeBtn);
-
-      closeBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        closeNav();
-      });
-    }
-
-    function openNav() {
-      navContainer.classList.add('mobile-open');
-      document.body.style.overflow = 'hidden';
-      hamburger.setAttribute('aria-expanded', 'true');
-      console.log('Nav opened');
-    }
-
-    function closeNav() {
-      navContainer.classList.remove('mobile-open');
-      document.body.style.overflow = '';
-      hamburger.setAttribute('aria-expanded', 'false');
-      console.log('Nav closed');
-    }
-
-    // Hamburger click
-    hamburger.addEventListener('click', function(e) {
+    // ---- STEP C: Add fresh click handler ----
+    newHam.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      if (navContainer.classList.contains('mobile-open')) {
-        closeNav();
+
+      const isOpen = nav.classList.contains('mobile-open');
+
+      if (isOpen) {
+        // Close
+        nav.classList.remove('mobile-open');
+        nav.style.display = 'none';
+        document.body.style.overflow = '';
+        newHam.setAttribute('aria-expanded', 'false');
       } else {
-        openNav();
+        // Open
+        nav.classList.add('mobile-open');
+        nav.style.cssText = `
+          display: flex !important;
+          flex-direction: column !important;
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          background: #04175e !important;
+          z-index: 999999 !important;
+          justify-content: center !important;
+          align-items: flex-start !important;
+          padding: 80px 32px 40px !important;
+          box-sizing: border-box !important;
+          overflow-y: auto !important;
+          gap: 4px !important;
+        `;
+        document.body.style.overflow = 'hidden';
+        newHam.setAttribute('aria-expanded', 'true');
+
+        // Style all links inside
+        const links = nav.querySelectorAll('a, li');
+        links.forEach(function(el) {
+          if (el.tagName === 'A') {
+            el.style.cssText = `
+              display: block !important;
+              color: white !important;
+              font-size: 1.3rem !important;
+              font-weight: 700 !important;
+              padding: 18px 0 !important;
+              text-decoration: none !important;
+              border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+              width: 100% !important;
+              opacity: 1 !important;
+              visibility: visible !important;
+            `;
+          }
+          if (el.tagName === 'LI') {
+            el.style.cssText = `
+              display: block !important;
+              width: 100% !important;
+              list-style: none !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              opacity: 1 !important;
+              visibility: visible !important;
+            `;
+          }
+        });
+
+        // Add or find close button
+        let closeBtn = nav.querySelector('.mob-close-btn');
+        if (!closeBtn) {
+          closeBtn = document.createElement('button');
+          closeBtn.className = 'mob-close-btn';
+          closeBtn.innerHTML = '✕';
+          closeBtn.setAttribute('type', 'button');
+          closeBtn.style.cssText = `
+            position: fixed !important;
+            top: 20px !important;
+            right: 20px !important;
+            width: 48px !important;
+            height: 48px !important;
+            background: rgba(255,255,255,0.15) !important;
+            border: none !important;
+            border-radius: 50% !important;
+            color: white !important;
+            font-size: 1.4rem !important;
+            cursor: pointer !important;
+            z-index: 9999999 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          `;
+          nav.appendChild(closeBtn);
+        }
+
+        closeBtn.onclick = function(e) {
+          e.stopPropagation();
+          nav.classList.remove('mobile-open');
+          nav.style.display = 'none';
+          document.body.style.overflow = '';
+          newHam.setAttribute('aria-expanded', 'false');
+        };
       }
     });
 
-    // Close when nav link is clicked
-    const allLinks = navContainer.querySelectorAll('a');
-    allLinks.forEach(function(link) {
+    // ---- STEP D: Close when nav link clicked ----
+    nav.querySelectorAll('a').forEach(function(link) {
       link.addEventListener('click', function() {
-        closeNav();
+        nav.classList.remove('mobile-open');
+        nav.style.display = 'none';
+        document.body.style.overflow = '';
       });
     });
 
-    // Close when clicking outside
+    // ---- STEP E: Close on outside click ----
     document.addEventListener('click', function(e) {
       if (
-        navContainer.classList.contains('mobile-open') &&
-        !navContainer.contains(e.target) &&
-        !hamburger.contains(e.target)
+        nav.classList.contains('mobile-open') &&
+        !nav.contains(e.target) &&
+        !newHam.contains(e.target)
       ) {
-        closeNav();
+        nav.classList.remove('mobile-open');
+        nav.style.display = 'none';
+        document.body.style.overflow = '';
       }
     });
 
-    // Close on Escape
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeNav();
-    });
-  }
-
-  // Run on DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMobileNav);
-  } else {
-    initMobileNav();
-  }
-
+  });
 })();
