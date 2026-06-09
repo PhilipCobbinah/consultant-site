@@ -211,19 +211,35 @@ img {
     padding: 1rem 0;
 }
 
-.nav-logo img,
-.logo img,
-header .logo img,
-nav .logo img {
-    max-height: 70px;
-    width: auto;
-    object-fit: contain;
+.nav-logo,
+.logo,
+.navbar-brand,
+header .logo,
+nav .logo,
+[class*="nav-logo"] {
+  display: flex !important;
+  align-items: center !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+  max-width: none !important;
+  clip-path: none !important;
 }
 
-.logo img {
-    height: 100px;
-    width: auto;
-    transition: transform 0.3s ease;
+.nav-logo img,
+.logo img,
+.navbar-brand img,
+header .logo img,
+nav .logo img,
+[class*="nav-logo"] img {
+  width: auto !important;
+  height: 52px !important;
+  max-height: 52px !important;
+  max-width: none !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+  display: block !important;
+  clip-path: none !important;
+  overflow: visible !important;
 }
 
 .logo img:hover {
@@ -307,6 +323,105 @@ nav .logo img {
 
 .mobile-menu.active span:nth-child(3) {
     transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Mobile menu overlay when open */
+.nav-links.active,
+.nav-menu.active,
+.nav-links.is-open,
+.nav-menu.is-open,
+[class*="nav-links"].active,
+[class*="nav-menu"].active,
+[class*="mobile-nav"].active,
+[class*="mobile-nav"].open {
+  display: flex !important;
+  flex-direction: column !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: #04175e !important;
+  z-index: 9998 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  padding: 80px 32px 40px !important;
+  box-sizing: border-box !important;
+}
+
+/* Each nav link in mobile menu */
+.nav-links.active a,
+.nav-menu.active a,
+.nav-links.active li a,
+.nav-menu.active li a,
+[class*="nav-links"].active a,
+[class*="nav-menu"].active a {
+  display: block !important;
+  color: white !important;
+  font-size: 1.4rem !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  padding: 18px 0 !important;
+  width: 100% !important;
+  text-align: left !important;
+  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Remove underline active indicator on mobile */
+.nav-links.active a.active,
+.nav-menu.active a.active,
+.nav-links.active a[class*="active"] {
+  color: #f0a500 !important;
+  border-bottom-color: rgba(240,165,0,0.3) !important;
+}
+
+/* Hover effect on mobile links */
+.nav-links.active a:hover,
+.nav-menu.active a:hover {
+  color: #f0a500 !important;
+  padding-left: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Close (X) button in mobile menu */
+.nav-close,
+.menu-close,
+[class*="nav-close"],
+[class*="close-btn"] {
+  position: absolute !important;
+  top: 20px !important;
+  right: 20px !important;
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  font-size: 1.6rem !important;
+  background: rgba(255,255,255,0.1) !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  z-index: 9999 !important;
+  border: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Hamburger icon lines — make them dark navy for visibility on white header */
+.hamburger span,
+.menu-toggle span,
+[class*="hamburger"] span,
+[class*="burger"] span {
+  background: #04175e !important;
+  display: block !important;
+  width: 26px !important;
+  height: 3px !important;
+  border-radius: 2px !important;
+  margin: 5px 0 !important;
 }
 
 .mobile-menu-overlay {
