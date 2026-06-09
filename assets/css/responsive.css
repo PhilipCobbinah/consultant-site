@@ -323,6 +323,226 @@
     }
 }
 
+/* ===========================================
+   ATTACHED REQUEST - GLOBAL AND LEADERSHIP MOBILE FIXES
+   =========================================== */
+
+@media (max-width: 768px) {
+  body,
+  html {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+  }
+
+  [class*="-hero"],
+  [class*="hero-"] {
+    overflow: hidden !important;
+  }
+
+  [class*="hero-text"],
+  [class*="hero-media"] {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 5vw, 2.4rem) !important;
+  }
+
+  h2 {
+    font-size: clamp(1.4rem, 4.5vw, 2rem) !important;
+  }
+
+  h3 {
+    font-size: clamp(1rem, 3.5vw, 1.4rem) !important;
+  }
+
+  section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  .btn,
+  button[class*="btn"],
+  a[class*="btn"] {
+    min-height: 44px !important;
+    font-size: 0.9rem !important;
+  }
+
+  [class*="-grid"]:not(.honeycomb-mobile-grid):not(.biz-track) {
+    grid-template-columns: 1fr !important;
+  }
+
+  [class*="-row"] {
+    flex-wrap: wrap !important;
+  }
+
+  .leadership-hero {
+    flex-direction: column !important;
+    min-height: auto !important;
+    height: auto !important;
+  }
+
+  .leadership-hero-media,
+  .leadership-hero-left,
+  .leadership-hero .contact-hero-media,
+  [class*="leadership"] [class*="hero-media"] {
+    width: 100% !important;
+    height: 55vw !important;
+    min-height: 260px !important;
+    max-height: 320px !important;
+    clip-path: none !important;
+    position: relative !important;
+  }
+
+  .leadership-hero-text,
+  .leadership-hero-right,
+  [class*="leadership"] [class*="hero-text"] {
+    width: 100% !important;
+    position: relative !important;
+    clip-path: none !important;
+    padding: 40px 20px !important;
+    min-height: auto !important;
+  }
+
+  .leadership-hero-text h1,
+  .leadership-hero-text h2,
+  .leadership-hero-right h1 {
+    font-size: 1.8rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .leadership-spotlight,
+  [class*="spotlight"] {
+    flex-direction: column !important;
+  }
+
+  .leadership-spotlight-img,
+  .spotlight-left,
+  [class*="spotlight"] [class*="img"] {
+    width: 100% !important;
+    height: 320px !important;
+    border-radius: 0 0 20px 20px !important;
+    position: relative !important;
+  }
+
+  .leadership-spotlight-content,
+  .spotlight-right,
+  [class*="spotlight"] [class*="content"] {
+    width: 100% !important;
+    padding: 32px 20px !important;
+  }
+
+  .leadership-spotlight-content h2,
+  .spotlight-right h3 {
+    font-size: 1.6rem !important;
+  }
+
+  .mgmt-grid-row,
+  [class*="commitment"] [class*="grid"],
+  [class*="leadership-commit"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .mgmt-card,
+  [class*="commit"] [class*="card"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 16px !important;
+  }
+
+  [class*="leadership"] [class*="cta"],
+  [class*="partner-cta"] {
+    flex-direction: column !important;
+    padding: 48px 20px !important;
+    text-align: center !important;
+  }
+
+  [class*="leadership"] [class*="cta"] h2 {
+    font-size: 1.7rem !important;
+  }
+
+  [class*="leadership"] [class*="cta"] button,
+  [class*="leadership"] [class*="cta"] a {
+    width: 100% !important;
+  }
+
+  .honeycomb-grid {
+    display: none !important;
+  }
+
+  .honeycomb-mobile-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 14px !important;
+    padding: 0 16px !important;
+    width: 100% !important;
+  }
+
+  .hmg-card {
+    background: linear-gradient(135deg, #0d2d6b, #1a5cbf);
+    border-radius: 16px;
+    padding: 22px 16px;
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hmg-icon {
+    font-size: 1.8rem;
+    display: block;
+  }
+
+  .hmg-card h3 {
+    font-size: 0.88rem !important;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .hmg-card p {
+    font-size: 0.76rem;
+    color: rgba(255,255,255,0.78);
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  [class*="-grid"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .honeycomb-grid {
+    transform: scale(0.78);
+    transform-origin: center top;
+    margin-bottom: -60px;
+  }
+}
+
+@media (min-width: 769px) {
+  .honeycomb-mobile-grid {
+    display: none !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .honeycomb-mobile-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* =============================================
    TABLET (481px - 768px)
    ============================================= */

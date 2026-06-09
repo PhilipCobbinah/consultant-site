@@ -1,3 +1,133 @@
+// === PRODUCTION VIDEO DELIVERY FALLBACK ===
+(function() {
+  const GITHUB_MEDIA_BASE = 'https://media.githubusercontent.com/media/PhilipCobbinah/consultant-site/main/';
+  const VIDEO_LOAD_TIMEOUT = 4500;
+
+  function toRepoPath(src) {
+    if (!src) return '';
+
+    try {
+      const url = new URL(src, window.location.href);
+      return decodeURIComponent(url.pathname.replace(/^\/+/, ''));
+    } catch (error) {
+      return src.replace(/^\/+/, '');
+    }
+  }
+
+  function encodeRepoPath(path) {
+    return path.split('/').map(encodeURIComponent).join('/');
+  }
+
+  function getVideoSource(video) {
+    const directSrc = video.getAttribute('src');
+    if (directSrc) return directSrc;
+
+    const source = video.querySelector('source[src]');
+    return source ? source.getAttribute('src') : '';
+  }
+
+  function setVideoSource(video, src) {
+    if (video.hasAttribute('src')) {
+      video.setAttribute('src', src);
+    } else {
+      const source = video.querySelector('source[src]');
+      if (source) {
+        source.setAttribute('src', src);
+      } else {
+        video.setAttribute('src', src);
+      }
+    }
+
+    video.load();
+  }
+
+  function playWhenReady(video) {
+    if (!video.autoplay && !video.classList.contains('active-video')) return;
+
+    video.muted = true;
+    video.playsInline = true;
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(function() {});
+    }
+  }
+
+  function applyPosterFallback(video) {
+    const poster = video.getAttribute('poster');
+    video.classList.add('video-fallback-active');
+
+    if (poster) {
+      video.style.setProperty('--video-poster', `url("${poster}")`);
+    }
+
+    try {
+      video.pause();
+    } catch (error) {}
+  }
+
+  function retryWithRemoteVideo(video) {
+    const originalPath = video.dataset.localVideoPath;
+    if (!originalPath || video.dataset.remoteVideoTried === 'true') {
+      applyPosterFallback(video);
+      return;
+    }
+
+    video.dataset.remoteVideoTried = 'true';
+    setVideoSource(video, GITHUB_MEDIA_BASE + encodeRepoPath(originalPath));
+    playWhenReady(video);
+
+    window.setTimeout(function() {
+      if (video.readyState === 0 && video.dataset.videoLoaded !== 'true') {
+        applyPosterFallback(video);
+      }
+    }, VIDEO_LOAD_TIMEOUT);
+  }
+
+  function prepareVideo(video) {
+    if (!video || video.dataset.videoDeliveryBound === 'true') return;
+
+    const src = getVideoSource(video);
+    const repoPath = toRepoPath(src);
+    if (!repoPath.startsWith('assets/videos/')) return;
+
+    video.dataset.videoDeliveryBound = 'true';
+    video.dataset.localVideoPath = repoPath;
+    video.preload = 'metadata';
+
+    video.addEventListener('loadedmetadata', function() {
+      video.dataset.videoLoaded = 'true';
+      video.classList.remove('video-fallback-active');
+    });
+
+    video.addEventListener('canplay', function() {
+      video.dataset.videoLoaded = 'true';
+      video.classList.remove('video-fallback-active');
+    });
+
+    video.addEventListener('error', function() {
+      retryWithRemoteVideo(video);
+    });
+
+    window.setTimeout(function() {
+      if (video.readyState === 0 && video.dataset.videoLoaded !== 'true') {
+        retryWithRemoteVideo(video);
+      }
+    }, VIDEO_LOAD_TIMEOUT);
+  }
+
+  function prepareAllVideos() {
+    document.querySelectorAll('video').forEach(prepareVideo);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', prepareAllVideos);
+  } else {
+    prepareAllVideos();
+  }
+
+  window.addEventListener('load', prepareAllVideos);
+})();
+
 // === GLOBAL HERO VIDEO AUTOPLAY ENFORCER ===
 (function() {
   function forcePlayAllHeroVideos() {

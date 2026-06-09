@@ -1889,24 +1889,29 @@ section {
 }
 
 .social-links-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: nowrap;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
   margin: 0;
   padding: 0;
 }
 
 .social-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 18px;
-  border-radius: 50px;
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 600;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 9px 18px !important;
+  border-radius: 50px !important;
+  min-width: 120px !important;
+  width: auto !important;
+  height: auto !important;
+  text-decoration: none !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
   border: 1.5px solid rgba(255,255,255,0.2);
   color: rgba(255,255,255,0.88);
   background: rgba(255,255,255,0.07);
@@ -1968,10 +1973,23 @@ section {
 }
 
 .social-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.social-label {
+  display: inline !important;
+  white-space: nowrap !important;
+}
+
+.social-link svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
 }
 
 /* Active press effect */
@@ -2395,6 +2413,22 @@ textarea {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+video.video-fallback-active {
+  background-image: var(--video-poster);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #040f2e;
+}
+
+.hero-cycle-video.video-fallback-active,
+[class*="-hero-video"].video-fallback-active,
+.chm-video.video-fallback-active,
+.svp-video.video-fallback-active,
+.contact-cycle-vid.video-fallback-active {
+  opacity: 1;
 }
 
 .carousel-container {
