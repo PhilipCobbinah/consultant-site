@@ -173,227 +173,173 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     </div>
 
     <!-- SERVICES CARDS GRID -->
-    <div style="background: #f4f6fb; padding: 20px 60px 70px;">
-        <div class="container">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+    <div class="services-grid" id="servicesGrid">
 
-                <!-- SERVICE 1: Investment Advisory -->
-                <div class="service-card-premium" style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transition: transform 0.3s ease, box-shadow 0.3s ease;" data-card-index="1">
-                    <div class="service-card-img" style="width: 100%; height: 180px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
-                        <img src="assets/images/investment2.jpg" alt="Investment Advisory Services" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); z-index: 1;"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 6px 12px; font-size: 1.6rem; z-index: 2;">📊</div>
-                    </div>
-                    <div class="service-card-content" style="padding: 24px 24px 28px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0d2d6b; margin: 0 0 10px 0;">Investment Advisory Services</h3>
-                        <div style="width: 36px; height: 3px; background: #f0a500; border-radius: 2px; margin-bottom: 12px;"></div>
-                        <p style="font-size: 0.87rem; color: #555; line-height: 1.65; margin: 0 0 14px 0;">
-                            We assist investors and organizations in identifying, evaluating, and pursuing viable investment opportunities across various sectors.
-                        </p>
-                        <ul style="margin: 0 0 14px 0; padding-left: 16px; list-style: disc; font-size: 0.83rem; color: #444; line-height: 1.7;">
-                            <li>Investment Opportunity Analysis</li>
-                            <li>Risk Assessment</li>
-                            <li>Business Evaluation</li>
-                            <li>Investment Structuring</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- SERVICE 2: Financial Consultancy -->
-                <div class="service-card-premium" style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transition: transform 0.3s ease, box-shadow 0.3s ease;" data-card-index="2">
-                    <div class="service-card-img" style="width: 100%; height: 180px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
-                        <img src="assets/images/finance.jpg" alt="Financial Consultancy" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); z-index: 1;"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 6px 12px; font-size: 1.6rem; z-index: 2;">💰</div>
-                    </div>
-                    <div class="service-card-content" style="padding: 24px 24px 28px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0d2d6b; margin: 0 0 10px 0;">Financial Consultancy</h3>
-                        <div style="width: 36px; height: 3px; background: #f0a500; border-radius: 2px; margin-bottom: 12px;"></div>
-                        <p style="font-size: 0.87rem; color: #555; line-height: 1.65; margin: 0 0 14px 0;">
-                            Our financial consulting services help businesses improve planning, performance, sustainability, and long-term profitability.
-                        </p>
-                        <ul style="margin: 0 0 14px 0; padding-left: 16px; list-style: disc; font-size: 0.83rem; color: #444; line-height: 1.7;">
-                            <li>Financial Analysis</li>
-                            <li>Business Planning</li>
-                            <li>Growth Strategies</li>
-                            <li>Financial Advisory</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- SERVICE 3: International Trade -->
-                <div class="service-card-premium" style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transition: transform 0.3s ease, box-shadow 0.3s ease;" data-card-index="3">
-                    <div class="service-card-img" style="width: 100%; height: 180px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
-                        <img src="assets/images/international.jpg" alt="International Trade Facilitation" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); z-index: 1;"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 6px 12px; font-size: 1.6rem; z-index: 2;">🌍</div>
-                    </div>
-                    <div class="service-card-content" style="padding: 24px 24px 28px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0d2d6b; margin: 0 0 10px 0;">International Trade Facilitation</h3>
-                        <div style="width: 36px; height: 3px; background: #f0a500; border-radius: 2px; margin-bottom: 12px;"></div>
-                        <p style="font-size: 0.87rem; color: #555; line-height: 1.65; margin: 0 0 14px 0;">
-                            We connect businesses to local and global markets, facilitating trade transactions and strategic international partnerships.
-                        </p>
-                        <ul style="margin: 0 0 14px 0; padding-left: 16px; list-style: disc; font-size: 0.83rem; color: #444; line-height: 1.7;">
-                            <li>Trade Advisory</li>
-                            <li>Export & Import Support</li>
-                            <li>Market Access</li>
-                            <li>Cross-Border Partnerships</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- SERVICE 4: Mineral Resource -->
-                <div class="service-card-premium" style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transition: transform 0.3s ease, box-shadow 0.3s ease;" data-card-index="4">
-                    <div class="service-card-img" style="width: 100%; height: 180px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
-                        <img src="assets/images/gold.jpg" alt="Mineral Resource Brokerage" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); z-index: 1;"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 6px 12px; font-size: 1.6rem; z-index: 2;">⛏️</div>
-                    </div>
-                    <div class="service-card-content" style="padding: 24px 24px 28px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0d2d6b; margin: 0 0 10px 0;">Mineral Resource Brokerage</h3>
-                        <div style="width: 36px; height: 3px; background: #f0a500; border-radius: 2px; margin-bottom: 12px;"></div>
-                        <p style="font-size: 0.87rem; color: #555; line-height: 1.65; margin: 0 0 14px 0;">
-                            We facilitate responsible sourcing, development, and brokerage opportunities within the mineral resource sector.
-                        </p>
-                        <ul style="margin: 0 0 14px 0; padding-left: 16px; list-style: disc; font-size: 0.83rem; color: #444; line-height: 1.7;">
-                            <li>Resource Sourcing</li>
-                            <li>Brokerage Services</li>
-                            <li>Industry Networking</li>
-                            <li>Strategic Resource Partnerships</li>
-                        </ul>
-                    
-                    </div>
-                </div>
-
-                <!-- SERVICE 5: Business Development -->
-                <div class="service-card-premium service-card--hidden" style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transition: transform 0.3s ease, box-shadow 0.3s ease;" data-card-index="5">
-                    <div class="service-card-img" style="width: 100%; height: 180px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
-                        <img src="assets/images/about-preview.jpg" alt="Business Development" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); z-index: 1;"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 6px 12px; font-size: 1.6rem; z-index: 2;">📈</div>
-                    </div>
-                    <div class="service-card-content" style="padding: 24px 24px 28px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0d2d6b; margin: 0 0 10px 0;">Business Development</h3>
-                        <div style="width: 36px; height: 3px; background: #f0a500; border-radius: 2px; margin-bottom: 12px;"></div>
-                        <p style="font-size: 0.87rem; color: #555; line-height: 1.65; margin: 0 0 14px 0;">
-                            Supporting organizations in expanding their market reach, improving visibility, and increasing profitability.
-                        </p>
-                        <ul style="margin: 0 0 14px 0; padding-left: 16px; list-style: disc; font-size: 0.83rem; color: #444; line-height: 1.7;">
-                            <li>Market Expansion</li>
-                            <li>Business Strategy</li>
-                            <li>Marketing Support</li>
-                            <li>Client Acquisition</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- SERVICE 6: Corporate Representation -->
-                <div class="service-card-premium service-card--hidden" style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transition: transform 0.3s ease, box-shadow 0.3s ease;" data-card-index="6">
-                    <div class="service-card-img" style="width: 100%; height: 180px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
-                        <img src="assets/images/negotiate.jpg" alt="Corporate Representation" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); z-index: 1;"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 6px 12px; font-size: 1.6rem; z-index: 2;">🏢</div>
-                    </div>
-                    <div class="service-card-content" style="padding: 24px 24px 28px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0d2d6b; margin: 0 0 10px 0;">Corporate Representation</h3>
-                        <div style="width: 36px; height: 3px; background: #f0a500; border-radius: 2px; margin-bottom: 12px;"></div>
-                        <p style="font-size: 0.87rem; color: #555; line-height: 1.65; margin: 0 0 14px 0;">
-                            Acting as trusted representatives for clients in negotiations, business engagements, partnerships, and strategic meetings.
-                        </p>
-                        <ul style="margin: 0 0 14px 0; padding-left: 16px; list-style: disc; font-size: 0.83rem; color: #444; line-height: 1.7;">
-                            <li>Corporate Liaison Services</li>
-                            <li>Business Representation</li>
-                            <li>Stakeholder Engagement</li>
-                            <li>Business Negotiation Support</li>
-                        </ul>
-                
-                    </div>
-                </div>
-
-                <!-- SERVICE 7: Strategic Partnership -->
-                <div class="service-card-premium service-card--hidden" style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transition: transform 0.3s ease, box-shadow 0.3s ease;" data-card-index="7">
-                    <div class="service-card-img" style="width: 100%; height: 180px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
-                        <img src="assets/images/about-preview1.jpg" alt="Strategic Partnership Development" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); z-index: 1;"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 6px 12px; font-size: 1.6rem; z-index: 2;">🤝</div>
-                    </div>
-                    <div class="service-card-content" style="padding: 24px 24px 28px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0d2d6b; margin: 0 0 10px 0;">Strategic Partnership Development</h3>
-                        <div style="width: 36px; height: 3px; background: #f0a500; border-radius: 2px; margin-bottom: 12px;"></div>
-                        <p style="font-size: 0.87rem; color: #555; line-height: 1.65; margin: 0 0 14px 0;">
-                            Building long-term partnerships that create value, unlock opportunities, and drive sustainable business growth.
-                        </p>
-                        <ul style="margin: 0 0 14px 0; padding-left: 16px; list-style: disc; font-size: 0.83rem; color: #444; line-height: 1.7;">
-                            <li>Partnership Identification</li>
-                            <li>Business Networking</li>
-                            <li>Joint Venture Support</li>
-                            <li>Strategic Alliance Development</li>
-                        </ul>
-                
-                    </div>
-                </div>
-
-                <!-- SERVICE 8: Project Financing -->
-                <div class="service-card-premium service-card--hidden" style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transition: transform 0.3s ease, box-shadow 0.3s ease;" data-card-index="8">
-                    <div class="service-card-img" style="width: 100%; height: 180px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
-                        <img src="assets/images/project.jpg" alt="Project Financing Support" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(255,255,255,0.9), transparent); z-index: 1;"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 6px 12px; font-size: 1.6rem; z-index: 2;">💳</div>
-                    </div>
-                    <div class="service-card-content" style="padding: 24px 24px 28px;">
-                        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0d2d6b; margin: 0 0 10px 0;">Project Financing Support</h3>
-                        <div style="width: 36px; height: 3px; background: #f0a500; border-radius: 2px; margin-bottom: 12px;"></div>
-                        <p style="font-size: 0.87rem; color: #555; line-height: 1.65; margin: 0 0 14px 0;">
-                            Assisting businesses and project owners in identifying funding opportunities and connecting with potential investors.
-                        </p>
-                        <ul style="margin: 0 0 14px 0; padding-left: 16px; list-style: disc; font-size: 0.83rem; color: #444; line-height: 1.7;">
-                            <li>Funding Opportunity Identification</li>
-                            <li>Investor Connections</li>
-                            <li>Project Structuring</li>
-                            <li>Financial Support Advisory</li>
-                        </ul>
-                    
-                    </div>
-                </div>
-
-                <!-- VIDEO PANEL -->
-                <div class="services-video-panel" id="servicesVideoPanel">
-                    <div class="svp-inner">
-                        <div class="svp-badge">Featured</div>
-                        <div class="svp-video-wrapper">
-                            <video 
-                                class="svp-video" 
-                                src="assets/videos/meeting.mp4" 
-                                poster="assets/images/about-preview3.jpg"
-                                loop
-                                muted
-                                playsinline
-                                id="servicesPromoVideo"
-                            ></video>
-                            <button class="svp-play-btn" id="svpPlayBtn" aria-label="Play video">
-                                <span class="svp-play-icon">▶</span>
-                            </button>
-                            <div class="svp-duration-badge">1:00</div>
-                        </div>
-                        <div class="svp-content">
-                            <h3 class="svp-title">See How We Work</h3>
-                            <p class="svp-subtitle">Watch how JOEL INVESTMENT, TRADE AND RESOURCES LTD. connects businesses, investors, and resources to drive sustainable growth across Africa and global markets.</p>
-                            <a href="contact.html" class="svp-cta-btn">Schedule A Consultation →</a>
-                        </div>
-                    </div>
-                </div>
-
+        <!-- Card 1: Investment Advisory -->
+        <div class="service-card service-card-premium" data-card-index="1" style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);transition:transform 0.3s ease,box-shadow 0.3s ease;">
+            <div class="service-card-img" style="width:100%;height:180px;overflow:hidden;border-radius:18px 18px 0 0;position:relative;">
+                <img src="assets/images/investment2.jpg" alt="Investment Advisory Services" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 0.5s ease;">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,rgba(255,255,255,0.9),transparent);z-index:1;"></div>
+                <div style="position:absolute;bottom:12px;left:16px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px 12px;font-size:1.6rem;z-index:2;">ðŸ“Š</div>
+            </div>
+            <div class="service-card-content" style="padding:24px 24px 28px;">
+                <h3 style="font-size:1.05rem;font-weight:700;color:#0d2d6b;margin:0 0 10px 0;">Investment Advisory Services</h3>
+                <div style="width:36px;height:3px;background:#f0a500;border-radius:2px;margin-bottom:12px;"></div>
+                <p style="font-size:0.87rem;color:#555;line-height:1.65;margin:0 0 14px 0;">We assist investors and organizations in identifying, evaluating, and pursuing viable investment opportunities across various sectors.</p>
+                <ul style="margin:0 0 14px 0;padding-left:16px;list-style:disc;font-size:0.83rem;color:#444;line-height:1.7;">
+                    <li>Investment Opportunity Analysis</li><li>Risk Assessment</li><li>Business Evaluation</li><li>Investment Structuring</li>
+                </ul>
             </div>
         </div>
-    </div>
+
+        <!-- Card 2: Financial Consultancy -->
+        <div class="service-card service-card-premium" data-card-index="2" style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);transition:transform 0.3s ease,box-shadow 0.3s ease;">
+            <div class="service-card-img" style="width:100%;height:180px;overflow:hidden;border-radius:18px 18px 0 0;position:relative;">
+                <img src="assets/images/finance.jpg" alt="Financial Consultancy" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 0.5s ease;">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,rgba(255,255,255,0.9),transparent);z-index:1;"></div>
+                <div style="position:absolute;bottom:12px;left:16px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px 12px;font-size:1.6rem;z-index:2;">ðŸ’°</div>
+            </div>
+            <div class="service-card-content" style="padding:24px 24px 28px;">
+                <h3 style="font-size:1.05rem;font-weight:700;color:#0d2d6b;margin:0 0 10px 0;">Financial Consultancy</h3>
+                <div style="width:36px;height:3px;background:#f0a500;border-radius:2px;margin-bottom:12px;"></div>
+                <p style="font-size:0.87rem;color:#555;line-height:1.65;margin:0 0 14px 0;">Our financial consulting services help businesses improve planning, performance, sustainability, and long-term profitability.</p>
+                <ul style="margin:0 0 14px 0;padding-left:16px;list-style:disc;font-size:0.83rem;color:#444;line-height:1.7;">
+                    <li>Financial Analysis</li><li>Business Planning</li><li>Growth Strategies</li><li>Financial Advisory</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Card 3: International Trade -->
+        <div class="service-card service-card-premium" data-card-index="3" style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);transition:transform 0.3s ease,box-shadow 0.3s ease;">
+            <div class="service-card-img" style="width:100%;height:180px;overflow:hidden;border-radius:18px 18px 0 0;position:relative;">
+                <img src="assets/images/international.jpg" alt="International Trade Facilitation" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 0.5s ease;">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,rgba(255,255,255,0.9),transparent);z-index:1;"></div>
+                <div style="position:absolute;bottom:12px;left:16px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px 12px;font-size:1.6rem;z-index:2;">ðŸŒ</div>
+            </div>
+            <div class="service-card-content" style="padding:24px 24px 28px;">
+                <h3 style="font-size:1.05rem;font-weight:700;color:#0d2d6b;margin:0 0 10px 0;">International Trade Facilitation</h3>
+                <div style="width:36px;height:3px;background:#f0a500;border-radius:2px;margin-bottom:12px;"></div>
+                <p style="font-size:0.87rem;color:#555;line-height:1.65;margin:0 0 14px 0;">We connect businesses to local and global markets, facilitating trade transactions and strategic international partnerships.</p>
+                <ul style="margin:0 0 14px 0;padding-left:16px;list-style:disc;font-size:0.83rem;color:#444;line-height:1.7;">
+                    <li>Trade Advisory</li><li>Export &amp; Import Support</li><li>Market Access</li><li>Cross-Border Partnerships</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Card 4: Mineral Resource Brokerage -->
+        <div class="service-card service-card-premium" data-card-index="4" style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);transition:transform 0.3s ease,box-shadow 0.3s ease;">
+            <div class="service-card-img" style="width:100%;height:180px;overflow:hidden;border-radius:18px 18px 0 0;position:relative;">
+                <img src="assets/images/gold.jpg" alt="Mineral Resource Brokerage" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 0.5s ease;">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,rgba(255,255,255,0.9),transparent);z-index:1;"></div>
+                <div style="position:absolute;bottom:12px;left:16px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px 12px;font-size:1.6rem;z-index:2;">â›ï¸</div>
+            </div>
+            <div class="service-card-content" style="padding:24px 24px 28px;">
+                <h3 style="font-size:1.05rem;font-weight:700;color:#0d2d6b;margin:0 0 10px 0;">Mineral Resource Brokerage</h3>
+                <div style="width:36px;height:3px;background:#f0a500;border-radius:2px;margin-bottom:12px;"></div>
+                <p style="font-size:0.87rem;color:#555;line-height:1.65;margin:0 0 14px 0;">We facilitate responsible sourcing, development, and brokerage opportunities within the mineral resource sector.</p>
+                <ul style="margin:0 0 14px 0;padding-left:16px;list-style:disc;font-size:0.83rem;color:#444;line-height:1.7;">
+                    <li>Resource Sourcing</li><li>Brokerage Services</li><li>Industry Networking</li><li>Strategic Resource Partnerships</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- VIDEO PANEL â€” JS moves this to after card4 (collapsed) or after card8 (expanded) -->
+        <div class="services-video-panel" id="servicesVideoPanel">
+            <div class="svp-inner">
+                <div class="svp-badge">Featured</div>
+                <div class="svp-video-wrapper">
+                    <video class="svp-video" src="assets/videos/company-intro.mp4"
+                        poster="assets/images/about-preview3.jpg"
+                        loop muted playsinline id="servicesPromoVideo"></video>
+                    <button class="svp-play-btn" id="svpPlayBtn" aria-label="Play video">
+                        <span class="svp-play-icon">â–¶</span>
+                    </button>
+                    <div class="svp-duration-badge">1:00</div>
+                </div>
+                <div class="svp-content">
+                    <h3 class="svp-title">See How We Work</h3>
+                    <p class="svp-subtitle">Watch how JOEL INVESTMENT connects businesses, investors, and resources to drive sustainable growth across Africa and global markets.</p>
+                    <a href="contact.html" class="svp-cta-btn">Schedule A Consultation â†’</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5: Business Development (hidden by default) -->
+        <div class="service-card service-card-premium svc-hidden" data-card-index="5" style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);transition:transform 0.3s ease,box-shadow 0.3s ease;">
+            <div class="service-card-img" style="width:100%;height:180px;overflow:hidden;border-radius:18px 18px 0 0;position:relative;">
+                <img src="assets/images/about-preview.jpg" alt="Business Development" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 0.5s ease;">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,rgba(255,255,255,0.9),transparent);z-index:1;"></div>
+                <div style="position:absolute;bottom:12px;left:16px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px 12px;font-size:1.6rem;z-index:2;">ðŸ“ˆ</div>
+            </div>
+            <div class="service-card-content" style="padding:24px 24px 28px;">
+                <h3 style="font-size:1.05rem;font-weight:700;color:#0d2d6b;margin:0 0 10px 0;">Business Development</h3>
+                <div style="width:36px;height:3px;background:#f0a500;border-radius:2px;margin-bottom:12px;"></div>
+                <p style="font-size:0.87rem;color:#555;line-height:1.65;margin:0 0 14px 0;">Supporting organizations in expanding their market reach, improving visibility, and increasing profitability.</p>
+                <ul style="margin:0 0 14px 0;padding-left:16px;list-style:disc;font-size:0.83rem;color:#444;line-height:1.7;">
+                    <li>Market Expansion</li><li>Business Strategy</li><li>Marketing Support</li><li>Client Acquisition</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Card 6: Corporate Representation (hidden by default) -->
+        <div class="service-card service-card-premium svc-hidden" data-card-index="6" style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);transition:transform 0.3s ease,box-shadow 0.3s ease;">
+            <div class="service-card-img" style="width:100%;height:180px;overflow:hidden;border-radius:18px 18px 0 0;position:relative;">
+                <img src="assets/images/negotiate.jpg" alt="Corporate Representation" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 0.5s ease;">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,rgba(255,255,255,0.9),transparent);z-index:1;"></div>
+                <div style="position:absolute;bottom:12px;left:16px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px 12px;font-size:1.6rem;z-index:2;">ðŸ¢</div>
+            </div>
+            <div class="service-card-content" style="padding:24px 24px 28px;">
+                <h3 style="font-size:1.05rem;font-weight:700;color:#0d2d6b;margin:0 0 10px 0;">Corporate Representation</h3>
+                <div style="width:36px;height:3px;background:#f0a500;border-radius:2px;margin-bottom:12px;"></div>
+                <p style="font-size:0.87rem;color:#555;line-height:1.65;margin:0 0 14px 0;">Acting as trusted representatives for clients in negotiations, business engagements, and strategic meetings.</p>
+                <ul style="margin:0 0 14px 0;padding-left:16px;list-style:disc;font-size:0.83rem;color:#444;line-height:1.7;">
+                    <li>Corporate Liaison Services</li><li>Business Representation</li><li>Stakeholder Engagement</li><li>Business Negotiation Support</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Card 7: Strategic Partnership (hidden by default) -->
+        <div class="service-card service-card-premium svc-hidden" data-card-index="7" style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);transition:transform 0.3s ease,box-shadow 0.3s ease;">
+            <div class="service-card-img" style="width:100%;height:180px;overflow:hidden;border-radius:18px 18px 0 0;position:relative;">
+                <img src="assets/images/about-preview1.jpg" alt="Strategic Partnership Development" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 0.5s ease;">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,rgba(255,255,255,0.9),transparent);z-index:1;"></div>
+                <div style="position:absolute;bottom:12px;left:16px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px 12px;font-size:1.6rem;z-index:2;">ðŸ¤</div>
+            </div>
+            <div class="service-card-content" style="padding:24px 24px 28px;">
+                <h3 style="font-size:1.05rem;font-weight:700;color:#0d2d6b;margin:0 0 10px 0;">Strategic Partnership Development</h3>
+                <div style="width:36px;height:3px;background:#f0a500;border-radius:2px;margin-bottom:12px;"></div>
+                <p style="font-size:0.87rem;color:#555;line-height:1.65;margin:0 0 14px 0;">Building long-term partnerships that create value, unlock opportunities, and drive sustainable business growth.</p>
+                <ul style="margin:0 0 14px 0;padding-left:16px;list-style:disc;font-size:0.83rem;color:#444;line-height:1.7;">
+                    <li>Partnership Identification</li><li>Business Networking</li><li>Joint Venture Support</li><li>Strategic Alliance Development</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Card 8: Project Financing (hidden by default) -->
+        <div class="service-card service-card-premium svc-hidden" data-card-index="8" style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);transition:transform 0.3s ease,box-shadow 0.3s ease;">
+            <div class="service-card-img" style="width:100%;height:180px;overflow:hidden;border-radius:18px 18px 0 0;position:relative;">
+                <img src="assets/images/project.jpg" alt="Project Financing Support" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 0.5s ease;">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,rgba(255,255,255,0.9),transparent);z-index:1;"></div>
+                <div style="position:absolute;bottom:12px;left:16px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px 12px;font-size:1.6rem;z-index:2;">ðŸ’³</div>
+            </div>
+            <div class="service-card-content" style="padding:24px 24px 28px;">
+                <h3 style="font-size:1.05rem;font-weight:700;color:#0d2d6b;margin:0 0 10px 0;">Project Financing Support</h3>
+                <div style="width:36px;height:3px;background:#f0a500;border-radius:2px;margin-bottom:12px;"></div>
+                <p style="font-size:0.87rem;color:#555;line-height:1.65;margin:0 0 14px 0;">Assisting businesses and project owners in identifying funding opportunities and connecting with potential investors.</p>
+                <ul style="margin:0 0 14px 0;padding-left:16px;list-style:disc;font-size:0.83rem;color:#444;line-height:1.7;">
+                    <li>Funding Opportunity Identification</li><li>Investor Connections</li><li>Project Structuring</li><li>Financial Support Advisory</li>
+                </ul>
+            </div>
+        </div>
+
+    </div><!-- /.services-grid -->
 
     <!-- SERVICES TOGGLE BUTTON -->
     <div class="services-toggle-wrapper">
         <div class="services-toggle-line"></div>
         <button class="services-toggle-btn" id="servicesToggleBtn">
             <span class="toggle-btn-text">View All Services</span>
-            <span class="toggle-btn-icon">↓</span>
+            <span class="toggle-btn-icon">â†“</span>
             <span class="toggle-btn-count">(4 more)</span>
         </button>
         <div class="services-toggle-line"></div>
@@ -401,6 +347,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
 </section>
 
+<!-- OUR PROCESS -->
 <!-- OUR PROCESS -->
 
 <section style="background: linear-gradient(135deg, #04175e 0%, #0a3d8f 100%); padding: 90px 60px; position: relative; overflow: hidden;">
@@ -474,7 +421,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <section style="background: linear-gradient(135deg, #f0a500 0%, #d4920a 100%); padding: 80px 60px; position: relative; overflow: hidden;">
 
     <!-- Decorative Quote Mark -->
-    <div style="position: absolute; top: 40px; left: 60px; font-size: 8rem; color: rgba(255,255,255,0.15); font-weight: 900; line-height: 0.8;">❝</div>
+    <div style="position: absolute; top: 40px; left: 60px; font-size: 8rem; color: rgba(255,255,255,0.15); font-weight: 900; line-height: 0.8;">â</div>
 
     <div class="container">
         <div style="display: grid; grid-template-columns: 60% 40%; gap: 40px; align-items: center;">
@@ -545,7 +492,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <div class="footer-social">
   <h4 class="footer-social-title">Connect With Us</h4>
   <div class="social-links-row">
-    <a href="https://www.linkedin.com/in/arinze-okafor-2b15241a3?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="social-link social-link--linkedin" aria-label="LinkedIn">
+    <a href="https://linkedin.com/company/joel-investment" target="_blank" rel="noopener noreferrer" class="social-link social-link--linkedin" aria-label="LinkedIn">
       <span class="social-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -591,6 +538,228 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 </footer>
 
 <script src="assets/js/main.js"></script>
+
+<!-- =====================================================
+     SERVICES PAGE â€” SELF-CONTAINED TOGGLE SCRIPT
+     Grid layout:
+       COLLAPSED: Row1[1,2,3] Row2[4, VIDEO(span2)]
+       EXPANDED:  Row1[1,2,3] Row2[4,5,6] Row3[7,8,VIDEO(span1)]
+     ===================================================== -->
+<script>
+(function() {
+
+  var btn      = document.getElementById('servicesToggleBtn');
+  var video    = document.getElementById('servicesVideoPanel');
+  var card4    = document.querySelector('[data-card-index="4"]');
+  var card8    = document.querySelector('[data-card-index="8"]');
+  var hiddenCards = [
+    document.querySelector('[data-card-index="5"]'),
+    document.querySelector('[data-card-index="6"]'),
+    document.querySelector('[data-card-index="7"]'),
+    document.querySelector('[data-card-index="8"]')
+  ].filter(Boolean);
+
+  if (!btn) return;
+
+  /* â”€â”€ 1. Ensure hidden cards start hidden â”€â”€ */
+  hiddenCards.forEach(function(c) {
+    c.style.display    = 'none';
+    c.style.opacity    = '';
+    c.style.transform  = '';
+    c.style.transition = '';
+  });
+
+  /* â”€â”€ 2. COLLAPSED starting position â”€â”€
+     Video after card 4, spanning 2 columns to fill the row cleanly. */
+  if (video && card4 && card4.parentNode) {
+    card4.parentNode.insertBefore(video, card4.nextSibling);
+    video.style.gridColumn = 'span 2';
+  }
+
+  var open = false;
+
+  /* â”€â”€ 3. Toggle click handler â”€â”€ */
+  btn.onclick = function(e) {
+    e.preventDefault();
+    open = !open;
+
+    if (open) {
+      /* ===== EXPAND: show cards 5-8, move video after card 8 ===== */
+
+      /* Show each hidden card with staggered fade-in FIRST */
+      hiddenCards.forEach(function(c, i) {
+        c.style.display    = 'flex';
+        c.style.opacity    = '0';
+        c.style.transform  = 'translateY(24px)';
+        c.style.transition = 'none';
+        setTimeout(function() {
+          c.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+          c.style.opacity    = '1';
+          c.style.transform  = 'translateY(0)';
+        }, 40 + i * 110);
+      });
+
+      /* Move video to after card 8 (last col of last row), span 1 column */
+      setTimeout(function() {
+        var c8 = document.querySelector('[data-card-index="8"]');
+        if (video && c8 && c8.parentNode) {
+          c8.parentNode.insertBefore(video, c8.nextSibling);
+          video.style.gridColumn = 'span 1';
+        }
+      }, 20);
+
+      /* Update button */
+      var t = btn.querySelector('.toggle-btn-text');
+      var n = btn.querySelector('.toggle-btn-count');
+      var k = btn.querySelector('.toggle-btn-icon');
+      if (t) t.textContent = 'Show Less';
+      if (n) n.textContent = '';
+      if (k) k.textContent = 'â†‘';
+      btn.classList.add('is-expanded');
+
+    } else {
+      /* ===== COLLAPSE: hide cards 5-8, move video back after card 4 ===== */
+
+      /* Fade out and hide each card */
+      hiddenCards.forEach(function(c, i) {
+        setTimeout(function() {
+          c.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+          c.style.opacity    = '0';
+          c.style.transform  = 'translateY(24px)';
+          setTimeout(function() {
+            c.style.display    = 'none';
+            c.style.opacity    = '';
+            c.style.transform  = '';
+            c.style.transition = '';
+          }, 380);
+        }, i * 60);
+      });
+
+      /* Move video back to after card 4, span 2 columns */
+      setTimeout(function() {
+        var c4 = document.querySelector('[data-card-index="4"]');
+        if (video && c4 && c4.parentNode) {
+          c4.parentNode.insertBefore(video, c4.nextSibling);
+          video.style.gridColumn = 'span 2';
+        }
+      }, hiddenCards.length * 60 + 400);
+
+      /* Update button */
+      var t2 = btn.querySelector('.toggle-btn-text');
+      var n2 = btn.querySelector('.toggle-btn-count');
+      var k2 = btn.querySelector('.toggle-btn-icon');
+      if (t2) t2.textContent = 'View All Services';
+      if (n2) n2.textContent = '(4 more)';
+      if (k2) k2.textContent = 'â†“';
+      btn.classList.remove('is-expanded');
+
+      /* Scroll back up to the section */
+      setTimeout(function() {
+        var s = document.getElementById('services-grid');
+        if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, hiddenCards.length * 60 + 450);
+    }
+  };
+
+})();
+</script>
+
+<script>
+(function() {
+  var ham = document.querySelector('.mobile-menu');
+  var nav = document.querySelector('.nav-links');
+
+  if (!ham) { console.error('HAM NOT FOUND'); return; }
+  if (!nav) { console.error('NAV NOT FOUND'); return; }
+
+  console.log('HAM:', ham.className, 'NAV:', nav.className);
+
+  function openMenu() {
+    nav.style.cssText = [
+      'display:flex',
+      'flex-direction:column',
+      'position:fixed',
+      'top:0',
+      'left:0',
+      'width:100vw',
+      'height:100vh',
+      'background:#04175e',
+      'z-index:999999',
+      'justify-content:center',
+      'align-items:flex-start',
+      'padding:80px 32px 40px',
+      'box-sizing:border-box',
+      'overflow-y:auto',
+      'gap:0',
+      'margin:0',
+      'list-style:none'
+    ].join('!important;') + '!important';
+
+    var items = nav.querySelectorAll('li, a');
+    items.forEach(function(el) {
+      if (el.tagName === 'LI') {
+        el.style.cssText = 'display:block!important;width:100%!important;list-style:none!important;margin:0!important;padding:0!important;border-bottom:1px solid rgba(255,255,255,0.12)!important;';
+      }
+      if (el.tagName === 'A') {
+        el.style.cssText = 'display:block!important;color:#ffffff!important;font-size:1.3rem!important;font-weight:700!important;padding:18px 0!important;text-decoration:none!important;opacity:1!important;visibility:visible!important;';
+      }
+    });
+
+    if (!document.getElementById('mob-close-x')) {
+      var closeBtn = document.createElement('button');
+      closeBtn.id = 'mob-close-x';
+      closeBtn.innerHTML = '&#x2715;';
+      closeBtn.style.cssText = 'position:fixed!important;top:16px!important;right:16px!important;width:48px!important;height:48px!important;background:rgba(255,255,255,0.15)!important;border:none!important;border-radius:50%!important;color:white!important;font-size:1.5rem!important;cursor:pointer!important;z-index:9999999!important;display:flex!important;align-items:center!important;justify-content:center!important;';
+      nav.appendChild(closeBtn);
+      closeBtn.onclick = function() { closeMenu(); };
+    }
+
+    document.body.style.overflow = 'hidden';
+    nav.dataset.open = '1';
+  }
+
+  function closeMenu() {
+    nav.style.cssText = 'display:none!important';
+    document.body.style.overflow = '';
+    nav.dataset.open = '0';
+    var x = document.getElementById('mob-close-x');
+    if (x) x.remove();
+  }
+
+  ham.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (nav.dataset.open === '1') {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  nav.querySelectorAll('a').forEach(function(a) {
+    a.addEventListener('click', function() { closeMenu(); });
+  });
+
+  document.addEventListener('click', function(e) {
+    if (nav.dataset.open === '1' && !nav.contains(e.target) && !ham.contains(e.target)) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  nav.style.cssText = window.innerWidth <= 768 ? 'display:none!important' : '';
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+      nav.style.cssText = '';
+      document.body.style.overflow = '';
+      nav.dataset.open = '0';
+    }
+  });
+})();
+</script>
 
 </body>
 </html>

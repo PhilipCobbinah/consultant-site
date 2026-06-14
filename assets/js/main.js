@@ -1,3 +1,59 @@
+// === GLOBAL ANIMATION SAFETY FALLBACK ===
+// Ensures scroll-animated elements are always visible even if IntersectionObserver fails
+(function() {
+  'use strict';
+
+  var SELECTORS = [
+    '.timeline-entry',
+    '.mv-card',
+    '.mgmt-card',
+    '.story-panel',
+    '.story-timeline',
+    '[class*="timeline-entry"]',
+    '[class*="mv-card"]',
+    '[class*="mgmt-card"]',
+    '[class*="animate-"]',
+    '[class*="-animated"]',
+    '.fade-in',
+    '.slide-in',
+    '.scroll-reveal',
+    '[data-aos]',
+    '.aos-init'
+  ];
+
+  function forceVisibleAll() {
+    SELECTORS.forEach(function(sel) {
+      try {
+        document.querySelectorAll(sel).forEach(function(el) {
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+          el.style.visibility = 'visible';
+          el.classList.add('visible');
+          el.classList.add('animated');
+        });
+      } catch(e) {}
+    });
+  }
+
+  // Run immediately (for already-parsed elements)
+  forceVisibleAll();
+
+  // Run after DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', forceVisibleAll);
+  } else {
+    forceVisibleAll();
+  }
+
+  // Run after full page load (images, fonts etc.)
+  window.addEventListener('load', forceVisibleAll);
+
+  // Final safety net at 500ms
+  setTimeout(forceVisibleAll, 500);
+  // And at 1000ms for very slow connections
+  setTimeout(forceVisibleAll, 1000);
+})();
+
 // === PRODUCTION VIDEO DELIVERY FALLBACK ===
 (function() {
   const GITHUB_MEDIA_BASE = 'https://media.githubusercontent.com/media/PhilipCobbinah/consultant-site/main/';
@@ -1807,18 +1863,28 @@ function initializeCarousels() {
           entry.target.classList.add('visible');
         }, index * 150);
         
-        // Optionally stop observing after animation triggers
+        // Stop observing after animation triggers
         observer.unobserve(entry.target);
       }
     });
   }, {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
+    threshold: 0.05,
+    rootMargin: '0px 0px 0px 0px'
   });
 
   timelineEntries.forEach(entry => {
     observer.observe(entry);
   });
+
+  // Fallback: force visible after 500ms if observer never fired
+  setTimeout(function() {
+    document.querySelectorAll('.timeline-entry').forEach(function(el) {
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+      el.style.visibility = 'visible';
+      el.classList.add('visible');
+    });
+  }, 500);
 })();
 
 // Mission & Vision Cards - Scroll Animation
@@ -1837,25 +1903,37 @@ function initializeCarousels() {
         if (card.classList.contains('mv-card-mission')) {
           setTimeout(() => {
             card.classList.add('visible');
-            card.style.animation = 'slideInLeft 0.8s ease forwards';
+            card.style.opacity = '1';
+            card.style.visibility = 'visible';
           }, 0);
         } else if (card.classList.contains('mv-card-vision')) {
           setTimeout(() => {
             card.classList.add('visible');
-            card.style.animation = 'slideInRight 0.8s ease forwards 0.15s';
-          }, 0);
+            card.style.opacity = '1';
+            card.style.visibility = 'visible';
+          }, 150);
         }
         
         observer.unobserve(entry.target);
       }
     });
   }, {
-    threshold: 0.2,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.05,
+    rootMargin: '0px 0px 0px 0px'
   });
 
   observer.observe(missionCard);
   observer.observe(visionCard);
+
+  // Fallback: force visible after 500ms if observer never fired
+  setTimeout(function() {
+    document.querySelectorAll('.mv-card, [class*="mv-card"]').forEach(function(card) {
+      card.style.opacity = '1';
+      card.style.transform = 'translateX(0)';
+      card.style.visibility = 'visible';
+      card.classList.add('visible');
+    });
+  }, 500);
 })();
 
 // Core Values - Premium Two-Column Auto-Sliding Carousel
@@ -1955,6 +2033,9 @@ function initializeCarousels() {
         // Add visible class with stagger delay
         setTimeout(() => {
           card.classList.add('visible');
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+          card.style.visibility = 'visible';
         }, index * 120);
         
         // Stop observing after animation triggers
@@ -1962,13 +2043,23 @@ function initializeCarousels() {
       }
     });
   }, {
-    threshold: 0.2,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.05,
+    rootMargin: '0px 0px 0px 0px'
   });
 
   cards.forEach((card) => {
     observer.observe(card);
   });
+
+  // Fallback: force visible after 500ms if observer never fired
+  setTimeout(function() {
+    document.querySelectorAll('.mgmt-card').forEach(function(card) {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+      card.style.visibility = 'visible';
+      card.classList.add('visible');
+    });
+  }, 500);
 })();
 
 // Orbit Carousel - DEPRECATED (kept for reference)
@@ -2580,72 +2671,7 @@ if ('IntersectionObserver' in window) {
     });
 })();
 
-/* ===========================================
-   SERVICES CARDS TOGGLE BUTTON + VIDEO PANEL
-   =========================================== */
-
-(function initServicesToggle() {
-    const toggleBtn = document.getElementById('servicesToggleBtn');
-    if (!toggleBtn) return;
-
-    const hiddenCards = document.querySelectorAll('.service-card--hidden');
-    const videoPanel = document.getElementById('servicesVideoPanel');
-    const servicesGrid = document.querySelector('[style*="grid-template-columns: repeat(3"]') || 
-                          document.querySelector('.services-grid');
-    let isExpanded = false;
-
-    toggleBtn.addEventListener('click', () => {
-        isExpanded = !isExpanded;
-
-        if (isExpanded) {
-            // Show hidden cards one by one with stagger
-            hiddenCards.forEach((card, i) => {
-                card.style.display = 'flex';
-                setTimeout(() => {
-                    card.classList.add('animate-in');
-                }, i * 120);
-            });
-            toggleBtn.querySelector('.toggle-btn-text').textContent = 'Show Less';
-            toggleBtn.querySelector('.toggle-btn-count').textContent = '';
-            toggleBtn.classList.add('is-expanded');
-
-            // Handle video panel: compact mode and reposition to end of grid
-            if (videoPanel && servicesGrid) {
-                videoPanel.classList.add('svp-compact');
-                servicesGrid.appendChild(videoPanel);
-            }
-        } else {
-            // Hide cards with animation
-            hiddenCards.forEach((card, i) => {
-                setTimeout(() => {
-                    card.classList.remove('animate-in');
-                    card.classList.add('service-card--hiding');
-                    setTimeout(() => {
-                        card.style.display = 'none';
-                        card.classList.remove('service-card--hiding');
-                    }, 400);
-                }, i * 80);
-            });
-            toggleBtn.querySelector('.toggle-btn-text').textContent = 'View All Services';
-            toggleBtn.querySelector('.toggle-btn-count').textContent = '(4 more)';
-            toggleBtn.classList.remove('is-expanded');
-
-            // Handle video panel: expand mode and move back after 4th card
-            if (videoPanel && servicesGrid) {
-                videoPanel.classList.remove('svp-compact');
-                const fourthCard = document.querySelector('[data-card-index="4"]');
-                if (fourthCard) {
-                    fourthCard.insertAdjacentElement('afterend', videoPanel);
-                }
-            }
-
-            // Scroll back up to the services section smoothly
-            setTimeout(() => {
-                document.querySelector('.services-toggle-wrapper').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, hiddenCards.length * 80 + 500);
-        }
-    });
-})();
+/* Services toggle code removed */
 
 /* ===========================================
    SERVICES VIDEO PLAY/PAUSE LOGIC
@@ -2736,179 +2762,206 @@ window.consultantWebsite = {
   });
 })();
 
-/* ========================================
-   MOBILE NAV — COMPLETE REBUILD
-   ======================================== */
+/* Mobile nav handled by inline scripts in each HTML page */
+
+// Services Grid — Collapsed & Expanded Layout Manager
 (function() {
-  'use strict';
+  function initServicesGrid() {
+    var toggleBtn  = document.getElementById('servicesToggleBtn');
+    var videoPanel = document.getElementById('servicesVideoPanel');
+    var grid       = document.getElementById('servicesGrid');
 
-  // Wait for DOM
-  document.addEventListener('DOMContentLoaded', function() {
+    if (!toggleBtn || !videoPanel || !grid) return;
 
-    // ---- STEP A: Find hamburger and nav using the ACTUAL class names from the HTML ----
-    // Try every common pattern
-    const ham =
-      document.querySelector('.hamburger') ||
-      document.querySelector('.menu-toggle') ||
-      document.querySelector('.nav-toggle') ||
-      document.querySelector('.burger') ||
-      document.querySelector('[class*="hamburger"]') ||
-      document.querySelector('[class*="menu-toggle"]') ||
-      document.querySelector('[class*="nav-toggle"]') ||
-      document.querySelector('button[aria-label]') ||
-      document.querySelector('header button') ||
-      document.querySelector('nav button') ||
-      document.querySelector('.mobile-menu');
+    var hiddenCards = Array.from(document.querySelectorAll('.service-card.svc-hidden'));
+    var isExpanded  = false;
 
-    const nav =
-      document.querySelector('.nav-links') ||
-      document.querySelector('.nav-menu') ||
-      document.querySelector('.nav-list') ||
-      document.querySelector('.navbar-nav') ||
-      document.querySelector('[class*="nav-links"]') ||
-      document.querySelector('[class*="nav-menu"]') ||
-      document.querySelector('header ul') ||
-      document.querySelector('nav ul') ||
-      document.querySelector('nav > ul') ||
-      document.querySelector('header nav ul');
-
-    // Log what was found so we can debug
-    console.log('HAM:', ham ? ham.className : 'NOT FOUND');
-    console.log('NAV:', nav ? nav.className : 'NOT FOUND');
-
-    if (!ham || !nav) {
-      console.error('Hamburger or nav not found - check class names');
-      return;
+    // ── COLLAPSED: Row2 = [Card4 | VIDEO(span2)] ──
+    function setCollapsedLayout() {
+      hiddenCards.forEach(function(card) {
+        card.style.display    = 'none';
+        card.style.opacity    = '';
+        card.style.transform  = '';
+        card.style.transition = '';
+      });
+      videoPanel.classList.remove('svp-expanded');
+      videoPanel.style.gridColumn = 'span 2';
+      var c4 = grid.querySelector('[data-card-index="4"]');
+      if (c4) grid.insertBefore(videoPanel, c4.nextSibling);
     }
 
-    // ---- STEP B: Remove old event listeners by cloning ----
-    const newHam = ham.cloneNode(true);
-    ham.parentNode.replaceChild(newHam, ham);
+    // ── EXPANDED: Row3 = [Card7 | Card8 | VIDEO(span1)] ──
+    function setExpandedLayout() {
+      hiddenCards.forEach(function(card, i) {
+        card.style.display    = 'flex';
+        card.style.opacity    = '0';
+        card.style.transform  = 'translateY(20px)';
+        card.style.transition = 'none';
+        setTimeout(function() {
+          card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          card.style.opacity    = '1';
+          card.style.transform  = 'translateY(0)';
+        }, i * 100);
+      });
+      setTimeout(function() {
+        videoPanel.classList.add('svp-expanded');
+        videoPanel.style.gridColumn = 'span 1';
+        var c8 = grid.querySelector('[data-card-index="8"]');
+        if (c8) grid.insertBefore(videoPanel, c8.nextSibling);
+      }, 50);
+    }
 
-    // ---- STEP C: Add fresh click handler ----
-    newHam.addEventListener('click', function(e) {
+    // Init
+    setCollapsedLayout();
+
+    // Toggle click
+    toggleBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      e.stopPropagation();
+      isExpanded = !isExpanded;
 
-      const isOpen = nav.classList.contains('mobile-open');
+      var btnText  = toggleBtn.querySelector('.toggle-btn-text');
+      var btnCount = toggleBtn.querySelector('.toggle-btn-count');
+      var btnIcon  = toggleBtn.querySelector('.toggle-btn-icon');
 
-      if (isOpen) {
-        // Close
-        nav.classList.remove('mobile-open');
-        nav.style.display = 'none';
-        document.body.style.overflow = '';
-        newHam.setAttribute('aria-expanded', 'false');
+      if (isExpanded) {
+        setExpandedLayout();
+        if (btnText)  btnText.textContent  = 'Show Less';
+        if (btnCount) btnCount.textContent = '';
+        if (btnIcon)  btnIcon.textContent  = '↑';
+        toggleBtn.classList.add('is-expanded');
       } else {
-        // Open
-        nav.classList.add('mobile-open');
-        nav.style.cssText = `
-          display: flex !important;
-          flex-direction: column !important;
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          width: 100vw !important;
-          height: 100vh !important;
-          background: #04175e !important;
-          z-index: 999999 !important;
-          justify-content: center !important;
-          align-items: flex-start !important;
-          padding: 80px 32px 40px !important;
-          box-sizing: border-box !important;
-          overflow-y: auto !important;
-          gap: 4px !important;
-        `;
-        document.body.style.overflow = 'hidden';
-        newHam.setAttribute('aria-expanded', 'true');
+        // Animate cards out
+        hiddenCards.forEach(function(card, i) {
+          setTimeout(function() {
+            card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            card.style.opacity    = '0';
+            card.style.transform  = 'translateY(20px)';
+            setTimeout(function() { card.style.display = 'none'; }, 320);
+          }, i * 60);
+        });
+        // After animation, reset layout
+        setTimeout(function() {
+          setCollapsedLayout();
+          var section = grid.closest('section') || grid.parentElement;
+          if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, hiddenCards.length * 60 + 380);
 
-        // Style all links inside
-        const links = nav.querySelectorAll('a, li');
-        links.forEach(function(el) {
-          if (el.tagName === 'A') {
-            el.style.cssText = `
-              display: block !important;
-              color: white !important;
-              font-size: 1.3rem !important;
-              font-weight: 700 !important;
-              padding: 18px 0 !important;
-              text-decoration: none !important;
-              border-bottom: 1px solid rgba(255,255,255,0.12) !important;
-              width: 100% !important;
-              opacity: 1 !important;
-              visibility: visible !important;
-            `;
-          }
-          if (el.tagName === 'LI') {
-            el.style.cssText = `
-              display: block !important;
-              width: 100% !important;
-              list-style: none !important;
-              margin: 0 !important;
-              padding: 0 !important;
-              opacity: 1 !important;
-              visibility: visible !important;
-            `;
-          }
+        if (btnText)  btnText.textContent  = 'View All Services';
+        if (btnCount) btnCount.textContent = '(4 more)';
+        if (btnIcon)  btnIcon.textContent  = '↓';
+        toggleBtn.classList.remove('is-expanded');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initServicesGrid);
+  } else {
+    initServicesGrid();
+  }
+})();
+
+(function() {
+  function initServicesToggle() {
+    var toggleBtn = document.getElementById('servicesToggleBtn');
+    if (!toggleBtn) return;
+
+    // Collect the 4 hidden cards by data-card-index
+    var hiddenCards = Array.from(
+      document.querySelectorAll('[data-card-index="5"],[data-card-index="6"],[data-card-index="7"],[data-card-index="8"]')
+    );
+
+    // Also catch anything with the hidden class that wasn't caught above
+    document.querySelectorAll('.service-card--hidden').forEach(function(c) {
+      if (!hiddenCards.includes(c)) hiddenCards.push(c);
+    });
+
+    // Force all hidden cards to truly be hidden on load
+    // by removing any inline style and relying on the CSS class
+    hiddenCards.forEach(function(card) {
+      card.style.display = '';        // clear any inline display
+      card.style.opacity = '';
+      card.style.transform = '';
+      card.style.transition = '';
+      // Make sure the hiding class is present
+      if (!card.classList.contains('service-card--hidden')) {
+        card.classList.add('service-card--hidden');
+      }
+    });
+
+    var isExpanded = false;
+
+    toggleBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      isExpanded = !isExpanded;
+
+      if (isExpanded) {
+        // --- SHOW ---
+        hiddenCards.forEach(function(card, i) {
+          // Remove the CSS class so display:none no longer applies
+          card.classList.remove('service-card--hidden');
+          // Set starting state for animation
+          card.style.display = 'flex';
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(24px)';
+          card.style.transition = 'none';
+          // Animate in with stagger
+          setTimeout(function() {
+            card.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 30 + i * 100);
         });
 
-        // Add or find close button
-        let closeBtn = nav.querySelector('.mob-close-btn');
-        if (!closeBtn) {
-          closeBtn = document.createElement('button');
-          closeBtn.className = 'mob-close-btn';
-          closeBtn.innerHTML = '✕';
-          closeBtn.setAttribute('type', 'button');
-          closeBtn.style.cssText = `
-            position: fixed !important;
-            top: 20px !important;
-            right: 20px !important;
-            width: 48px !important;
-            height: 48px !important;
-            background: rgba(255,255,255,0.15) !important;
-            border: none !important;
-            border-radius: 50% !important;
-            color: white !important;
-            font-size: 1.4rem !important;
-            cursor: pointer !important;
-            z-index: 9999999 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-          `;
-          nav.appendChild(closeBtn);
-        }
+        // Update button
+        var txt = toggleBtn.querySelector('.toggle-btn-text');
+        var cnt = toggleBtn.querySelector('.toggle-btn-count');
+        var ico = toggleBtn.querySelector('.toggle-btn-icon');
+        if (txt) txt.textContent = 'Show Less';
+        if (cnt) cnt.textContent = '';
+        if (ico) ico.textContent = '↑';
+        toggleBtn.classList.add('is-expanded');
 
-        closeBtn.onclick = function(e) {
-          e.stopPropagation();
-          nav.classList.remove('mobile-open');
-          nav.style.display = 'none';
-          document.body.style.overflow = '';
-          newHam.setAttribute('aria-expanded', 'false');
-        };
+      } else {
+        // --- HIDE ---
+        hiddenCards.forEach(function(card, i) {
+          setTimeout(function() {
+            card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(24px)';
+            // After animation ends, re-add the class (restores display:none)
+            setTimeout(function() {
+              card.style.display = '';
+              card.style.opacity = '';
+              card.style.transform = '';
+              card.style.transition = '';
+              card.classList.add('service-card--hidden');
+            }, 380);
+          }, i * 60);
+        });
+
+        // Update button
+        var txt2 = toggleBtn.querySelector('.toggle-btn-text');
+        var cnt2 = toggleBtn.querySelector('.toggle-btn-count');
+        var ico2 = toggleBtn.querySelector('.toggle-btn-icon');
+        if (txt2) txt2.textContent = 'View All Services';
+        if (cnt2) cnt2.textContent = '(4 more)';
+        if (ico2) ico2.textContent = '↓';
+        toggleBtn.classList.remove('is-expanded');
+
+        // Scroll back up to the cards section
+        setTimeout(function() {
+          var section = document.getElementById('services-grid') ||
+                        toggleBtn.closest('section');
+          if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, hiddenCards.length * 60 + 420);
       }
     });
+  }
 
-    // ---- STEP D: Close when nav link clicked ----
-    nav.querySelectorAll('a').forEach(function(link) {
-      link.addEventListener('click', function() {
-        nav.classList.remove('mobile-open');
-        nav.style.display = 'none';
-        document.body.style.overflow = '';
-      });
-    });
-
-    // ---- STEP E: Close on outside click ----
-    document.addEventListener('click', function(e) {
-      if (
-        nav.classList.contains('mobile-open') &&
-        !nav.contains(e.target) &&
-        !newHam.contains(e.target)
-      ) {
-        nav.classList.remove('mobile-open');
-        nav.style.display = 'none';
-        document.body.style.overflow = '';
-      }
-    });
-
-  });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initServicesToggle);
+  } else {
+    initServicesToggle();
+  }
 })();

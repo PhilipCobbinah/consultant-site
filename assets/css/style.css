@@ -799,14 +799,16 @@ nav .logo img,
     padding-left: 40px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     border-left: 4px solid #0a4fa6;
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 1;
+    transform: translateY(0);
     transition: opacity 0.6s ease, transform 0.6s ease;
+    visibility: visible;
 }
 
 .timeline-entry.visible {
     opacity: 1;
     transform: translateY(0);
+    visibility: visible;
 }
 
 .timeline-dot {
@@ -960,13 +962,19 @@ nav .logo img,
     overflow: hidden;
     border-radius: 20px;
     padding: 48px 40px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.6s ease;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-    opacity: 0;
+    opacity: 1;
+    visibility: visible;
+    display: flex;
+    flex-direction: column;
+    animation-play-state: running !important;
+    animation-delay: 0s !important;
 }
 
 .mv-card.visible {
     opacity: 1;
+    visibility: visible;
 }
 
 .mv-card:hover {
@@ -1440,12 +1448,15 @@ nav .logo img,
 
 /* Management Team - Scroll Animations */
 .mgmt-card {
-    opacity: 0;
-    transform: translateY(40px);
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
 }
 
 .mgmt-card.visible {
-    animation: fadeInUp 0.6s ease forwards;
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
 }
 
 /* CEO Info Overlay at Bottom */
@@ -6422,31 +6433,34 @@ blockquote footer {
     transform: scale(1.08);
 }
 
-/* Service Card Show/Hide Toggle */
-.service-card--hidden {
+/* ─── Services Grid Layout System ─── */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    padding: 20px 60px 60px;
+    background: #f4f6fb;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Hidden cards: invisible by default */
+.service-card.svc-hidden {
     display: none;
-    opacity: 0;
-    transform: translateY(30px);
 }
 
-.service-card--hidden.animate-in {
-    display: flex;
-    animation: cardReveal 0.5s ease forwards;
+/* Video panel collapsed: spans 2 columns */
+#servicesVideoPanel,
+.services-video-panel {
+    grid-column: span 2;
 }
 
-.service-card--hiding {
-    animation: cardHide 0.4s ease forwards;
+/* Video panel expanded: spans 1 column */
+#servicesVideoPanel.svp-expanded,
+.services-video-panel.svp-expanded {
+    grid-column: span 1;
 }
 
-@keyframes cardReveal {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes cardHide {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(30px); }
-}
 
 .services-toggle-wrapper {
     display: flex;
@@ -6478,6 +6492,14 @@ blockquote footer {
     transition: all 0.3s ease;
     white-space: nowrap;
     box-shadow: 0 4px 16px rgba(10, 79, 166, 0.12);
+}
+
+#servicesToggleBtn {
+  pointer-events: all !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  position: relative !important;
+  touch-action: manipulation !important;
 }
 
 .services-toggle-btn:hover {
@@ -7977,3 +7999,45 @@ button {
     justify-content: center !important;
   }
 }
+
+/* ========================================
+   HAMBURGER CLICKABILITY FIX
+   Ensure .mobile-menu is always tappable on mobile
+   ======================================== */
+.mobile-menu {
+  pointer-events: all !important;
+  cursor: pointer !important;
+  z-index: 10000 !important;
+  position: relative !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Ensure hamburger is always tappable */
+.hamburger,
+.menu-toggle,
+.nav-toggle,
+.burger,
+.mobile-menu,
+header button,
+nav > button,
+[class*="hamburger"],
+[class*="menu-toggle"],
+[class*="nav-toggle"] {
+  pointer-events: all !important;
+  cursor: pointer !important;
+  z-index: 100000 !important;
+  position: relative !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
