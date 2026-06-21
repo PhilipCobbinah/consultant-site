@@ -12,7 +12,6 @@ content="Contact JOEL INVESTMENT, TRADE AND RESOURCES LTD. for investment adviso
 
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="assets/css/responsive.css">
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet"
@@ -50,12 +49,20 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
   "logo": "https://www.yourdomain.com/assets/images/logo/joel_investment_logo.jpeg",
   "email": "joelinvestmentltd@gmail.com",
   "telephone": "+233 54 622 3968",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "14 Anyame Street",
-    "addressLocality": "Abuja",
-    "addressCountry": "Nigeria"
-  },
+  "address": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "10 Kassim Street",
+      "addressLocality": "Accra",
+      "addressCountry": "Ghana"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Gwarimpa",
+      "addressLocality": "Abuja",
+      "addressCountry": "Nigeria"
+    }
+  ],
   "founder": {
     "@type": "Person",
     "name": "Okafor C. Arinze"
@@ -704,33 +711,36 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
 <!-- Header -->
 <header class="header">
-    <div class="container nav-container">
-        <a href="index.html" class="logo">
-            <img src="assets/images/logo/joel_investment_logo2.jpeg" alt="JOEL Investment Logo">
-        </a>
-        <nav class="navbar">
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About Us</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="leadership.html">Leadership</a></li>
-                <li><a href="contact.html" class="active">Contact</a></li>
-            </ul>
-        </nav>
-        <div class="mobile-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</header>
+            <div class="container nav-container">
+                <a href="index.html" class="logo">
+                    <img
+                        src="assets/images/logo/joel_investment_logo.png"
+                        alt="JOEL Investment Logo"
+                    />
+                </a>
+                <nav class="navbar">
+                    <ul class="nav-links" id="mainNavList">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="leadership.html">Leadership</a></li>
+                        <li><a href="contact.html" class="active">Contact</a></li>
+                    </ul>
+                </nav>
+                <button class="hamburger-btn" id="mainHamburgerBtn" aria-label="Toggle navigation menu" type="button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
 
 <!-- PROMPT 1: CONTACT HERO SECTION -->
 <section class="contact-hero">
   <div class="contact-hero-left">
     <!-- Video Panel -->
     <div class="contact-video-panel">
-      <video id="contactVideo" poster="assets/images/about-preview3.jpg" autoplay muted loop playsinline>
+      <video id="contactVideo" poster="assets/images/about-preview3.jpg" autoplay muted playsinline>
         <source src="assets/videos/company-intro.mp4" type="video/mp4">
       </video>
       <button class="video-control-btn" id="videoPlayPauseBtn">▶</button>
@@ -766,7 +776,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
       </div>
       <div class="contact-info-row">
         <div class="contact-info-icon">📍</div>
-        <div class="contact-info-text secondary">14 Anyame Street, Abuja, Nigeria</div>
+        <div class="contact-info-text secondary">Gwarimpa, Abuja, Nigeria</div>
       </div>
     </div>
 
@@ -810,7 +820,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         <div class="contact-block-icon">📍</div>
         <div class="contact-block-content">
           <div class="contact-block-label">Africa Head Offices</div>
-          <div class="contact-block-value">14 Anyame Street, Abuja, Nigeria</div>
+          <div class="contact-block-value">Gwarimpa, Abuja, Nigeria</div>
         </div>
       </div>
 
@@ -921,7 +931,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
       <div class="map-info-block">
         <span class="map-info-block-icon">📍</span>
-        <span>14 Anyame Street, Abuja, Nigeria</span>
+        <span>Gwarimpa, Abuja, Nigeria</span>
       </div>
 
       <div class="map-info-block">
@@ -934,12 +944,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         <span>joelinvestmentltd@gmail.com</span>
       </div>
 
-      <a href="https://maps.google.com/maps?q=14+Anyame+Street+Abuja+Nigeria" target="_blank" class="map-directions-btn">Get Directions</a>
+      <a href="https://maps.google.com/maps?q=Gwarimpa+Abuja+Nigeria" target="_blank" class="map-directions-btn">Get Directions</a>
     </div>
 
     <!-- Right - Map Embed -->
     <div class="map-iframe-container">
-      <iframe src="https://maps.google.com/maps?q=14+Anyame+Street+Abuja+Nigeria&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe>
+      <iframe src="https://maps.google.com/maps?q=Gwarimpa+Abuja+Nigeria&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe>
     </div>
   </div>
 </section>
@@ -1149,5 +1159,51 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 })();
 </script>
 
+<script>
+(function() {
+  var btn = document.getElementById('mainHamburgerBtn');
+  var nav = document.getElementById('mainNavList');
+  if (!btn || !nav) return;
+
+  // Create backdrop element once
+  var backdrop = document.createElement('div');
+  backdrop.className = 'nav-backdrop';
+  document.body.appendChild(backdrop);
+
+  function openMenu() {
+    nav.classList.add('is-open');
+    backdrop.classList.add('is-visible');
+    btn.classList.add('is-active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    nav.classList.remove('is-open');
+    backdrop.classList.remove('is-visible');
+    btn.classList.remove('is-active');
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    nav.classList.contains('is-open') ? closeMenu() : openMenu();
+  });
+
+  backdrop.addEventListener('click', closeMenu);
+
+  nav.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', closeMenu);
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) closeMenu();
+  });
+})();
+</script>
 </body>
 </html>

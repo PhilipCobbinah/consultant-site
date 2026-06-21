@@ -1,3 +1,5 @@
+window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
+
 // === GLOBAL ANIMATION SAFETY FALLBACK ===
 // Ensures scroll-animated elements are always visible even if IntersectionObserver fails
 (function() {
@@ -54,6 +56,1153 @@
   setTimeout(forceVisibleAll, 1000);
 })();
 
+// === HOME HERO IMAGE / VIDEO SEQUENCE ===
+(function initHomeHeroMediaSequence() {
+  'use strict';
+
+  const IMAGE_DURATION = 5000;
+  const MAX_VIDEO_DURATION = 10000;
+
+  function ready(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    } else {
+      fn();
+    }
+  }
+
+  ready(function() {
+    const root = document.getElementById('homeHeroMedia') || document.querySelector('.hero-right');
+    const image = document.getElementById('heroImageMain');
+    const carousel = document.getElementById('heroVideoCarousel');
+    const videos = carousel ? Array.prototype.slice.call(carousel.querySelectorAll('.hero-video')) : [];
+
+    if (!root || !image || !carousel || videos.length === 0 || root.dataset.homeHeroBound === 'true') return;
+    root.dataset.homeHeroBound = 'true';
+    root.classList.add('hero-media-sequence');
+    image.classList.add('hero-media-item');
+    carousel.classList.add('hero-media-video-layer');
+
+    const progress = carousel.querySelector('.progress-fill');
+    const currentTime = carousel.querySelector('.current-time');
+    const duration = carousel.querySelector('.duration');
+    const playPause = document.getElementById('heroVideoPausePlay');
+
+    const items = [{ type: 'image', element: image, duration: IMAGE_DURATION }].concat(
+      videos.map(function(video) {
+        return { type: 'video', element: video, duration: MAX_VIDEO_DURATION };
+      })
+    );
+
+    let currentIndex = 0;
+    let timer = null;
+    let paused = false;
+    let activeVideo = null;
+    let videoEndedHandler = null;
+    let videoMetadataHandler = null;
+
+    videos.forEach(function(video) {
+      video.classList.add('hero-media-item');
+      video.autoplay = true;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.loop = false;
+      video.controls = false;
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.setAttribute('autoplay', '');
+      video.setAttribute('muted', '');
+      video.removeAttribute('loop');
+      video.removeAttribute('controls');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('preload', 'auto');
+      try { video.load(); } catch (error) {}
+    });
+
+    function formatTime(milliseconds) {
+      const seconds = Math.round(milliseconds / 1000);
+      return '0:' + String(seconds).padStart(2, '0');
+    }
+
+    function resetProgress(item) {
+      if (!progress) return;
+      const durationMs = item.duration || MAX_VIDEO_DURATION;
+      progress.style.transition = 'none';
+      progress.style.width = '0%';
+      progress.offsetHeight;
+      progress.style.transition = 'width ' + durationMs + 'ms linear';
+      progress.style.width = '100%';
+      if (duration) duration.textContent = formatTime(durationMs);
+      if (currentTime) currentTime.textContent = '0:00';
+    }
+
+    function setPlayIcon() {
+      if (!playPause) return;
+      playPause.innerHTML = paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+      playPause.setAttribute('aria-label', paused ? 'Play hero media' : 'Pause hero media');
+    }
+
+    function clearVideoTimerAndHandlers(resetActive) {
+      window.clearTimeout(timer);
+      timer = null;
+      if (activeVideo) {
+        if (videoEndedHandler) activeVideo.removeEventListener('ended', videoEndedHandler);
+        if (videoMetadataHandler) activeVideo.removeEventListener('loadedmetadata', videoMetadataHandler);
+        if (resetActive) resetVideo(activeVideo);
+      }
+      activeVideo = null;
+      videoEndedHandler = null;
+      videoMetadataHandler = null;
+    }
+
+    function resetVideo(video) {
+      if (!video) return;
+      try { video.pause(); } catch (error) {}
+      try { video.currentTime = 0; } catch (error) {}
+    }
+
+    function pauseAllVideos(except) {
+      videos.forEach(function(video) {
+        if (video !== except) {
+          resetVideo(video);
+          video.classList.remove('active', 'active-video');
+        }
+      });
+    }
+
+    function getKnownVideoDurationMs(video) {
+      return Number.isFinite(video.duration) && video.duration > 0
+        ? Math.min(video.duration * 1000, MAX_VIDEO_DURATION)
+        : MAX_VIDEO_DURATION;
+    }
+
+    function scheduleVideoAdvance(video) {
+      activeVideo = video;
+      const startedAt = Date.now();
+
+      function advance() {
+        if (activeVideo !== video || paused) return;
+        clearVideoTimerAndHandlers(false);
+        resetVideo(video);
+        showItem(currentIndex + 1);
+      }
+
+      function armMaxTimer() {
+        window.clearTimeout(timer);
+        const elapsed = Date.now() - startedAt;
+        const remaining = Math.max(0, MAX_VIDEO_DURATION - elapsed);
+        timer = window.setTimeout(advance, remaining);
+      }
+
+      videoEndedHandler = function() {
+        window.clearTimeout(timer);
+        advance();
+      };
+
+      videoMetadataHandler = function() {
+        resetProgress({
+          type: 'video',
+          element: video,
+          duration: getKnownVideoDurationMs(video)
+        });
+
+        if (Number.isFinite(video.duration) && video.duration > 0 && video.duration <= (MAX_VIDEO_DURATION / 1000)) {
+          window.clearTimeout(timer);
+          timer = null;
+        } else {
+          armMaxTimer();
+        }
+      };
+
+      video.addEventListener('ended', videoEndedHandler);
+      video.addEventListener('loadedmetadata', videoMetadataHandler);
+      armMaxTimer();
+
+      if (video.readyState >= 1) {
+        videoMetadataHandler();
+      } else {
+        resetProgress({ type: 'video', element: video, duration: MAX_VIDEO_DURATION });
+      }
+    }
+
+    function showItem(nextIndex) {
+      clearVideoTimerAndHandlers(false);
+      currentIndex = (nextIndex + items.length) % items.length;
+      const item = items[currentIndex];
+      const isVideo = item.type === 'video';
+
+      image.classList.toggle('active', !isVideo);
+      image.classList.toggle('hidden', isVideo);
+      image.style.opacity = isVideo ? '0' : '1';
+      image.style.zIndex = isVideo ? '1' : '4';
+      image.style.pointerEvents = isVideo ? 'none' : 'auto';
+
+      carousel.classList.toggle('visible', isVideo);
+      carousel.style.opacity = isVideo ? '1' : '0';
+      carousel.style.zIndex = isVideo ? '4' : '1';
+      carousel.style.pointerEvents = isVideo ? 'auto' : 'none';
+
+      if (isVideo) {
+        const video = item.element;
+        pauseAllVideos(video);
+        video.classList.add('active', 'active-video');
+        video.style.opacity = '1';
+        video.style.zIndex = '3';
+        resetVideo(video);
+        if (!paused) {
+          const playPromise = video.play();
+          if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(function() {});
+          }
+          scheduleVideoAdvance(video);
+        }
+      } else {
+        pauseAllVideos(null);
+      }
+
+      videos.forEach(function(video) {
+        if (!isVideo || video !== item.element) {
+          video.style.opacity = '0';
+          video.style.zIndex = '1';
+        }
+      });
+
+      if (!isVideo) resetProgress(item);
+      setPlayIcon();
+
+      if (!paused && !isVideo) {
+        timer = window.setTimeout(function() {
+          showItem(currentIndex + 1);
+        }, item.duration);
+      }
+    }
+
+    if (playPause) {
+      playPause.addEventListener('click', function(event) {
+        event.preventDefault();
+        paused = !paused;
+        const item = items[currentIndex];
+        if (paused) {
+          clearVideoTimerAndHandlers(false);
+          if (item.type === 'video') item.element.pause();
+          if (progress) progress.style.transition = 'none';
+        } else {
+          if (item.type === 'video') item.element.play().catch(function() {});
+          showItem(currentIndex);
+        }
+        setPlayIcon();
+      });
+    }
+
+    showItem(0);
+  });
+})();
+
+// === JOEL GLOBAL ANIMATION MANAGER ===
+(function initJoelGlobalAnimationManager() {
+  'use strict';
+
+  const SLIDE_INTERVAL = 3000;
+  const MAX_VIDEO_DURATION = 10000;
+  const TICK_INTERVAL = 1000;
+  const ANIMATION_DURATION = 800;
+  const ACTIVE_CLASSES = ['active', 'active-video'];
+  const controllers = [];
+  let masterTimer = null;
+  let globallyPaused = false;
+
+  function ready(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    } else {
+      fn();
+    }
+  }
+
+  function toArray(list) {
+    return Array.prototype.slice.call(list || []);
+  }
+
+  function unique(items) {
+    return items.filter(function(item, index) {
+      return item && items.indexOf(item) === index;
+    });
+  }
+
+  function setMediaDefaults(media, eager) {
+    if (!media) return;
+    if (media.tagName === 'IMG') {
+      media.decoding = 'async';
+      media.loading = eager ? 'eager' : 'lazy';
+      if (media.src) {
+        const preloader = new Image();
+        preloader.src = media.currentSrc || media.src;
+      }
+    }
+    if (media.tagName === 'VIDEO') {
+      media.muted = true;
+      media.defaultMuted = true;
+      media.loop = false;
+      media.autoplay = true;
+      media.playsInline = true;
+      media.setAttribute('muted', '');
+      media.removeAttribute('loop');
+      media.setAttribute('autoplay', '');
+      media.setAttribute('playsinline', '');
+      media.preload = eager || media.closest('[class*="hero"], .contact-video-cycle') ? 'auto' : 'metadata';
+      if (media.poster) {
+        media.style.setProperty('--video-poster', 'url("' + media.poster + '")');
+      }
+    }
+  }
+
+  function playVideo(video) {
+    if (!video || video.tagName !== 'VIDEO') return;
+    setMediaDefaults(video, true);
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(function() {
+        video.muted = true;
+        video.classList.add('video-fallback-active');
+      });
+    }
+  }
+
+  function pauseVideo(video) {
+    if (video && video.tagName === 'VIDEO' && !video.paused) {
+      video.pause();
+    }
+  }
+
+  function findDots(root, dotSelector) {
+    const scopes = unique([
+      root,
+      root.parentElement,
+      root.closest('section'),
+      root.closest('[class*="hero"]'),
+      root.closest('[class*="carousel"]'),
+      root.closest('[class*="slider"]')
+    ]);
+
+    for (const scope of scopes) {
+      const dots = toArray(scope.querySelectorAll(dotSelector));
+      if (dots.length) return dots;
+    }
+    return [];
+  }
+
+  function findControlButton(root, selectors) {
+    const scopes = unique([
+      root,
+      root.parentElement,
+      root.closest('section'),
+      root.closest('[class*="carousel"]'),
+      root.closest('[class*="slider"]')
+    ]);
+
+    for (const scope of scopes) {
+      const button = scope.querySelector(selectors);
+      if (button) return button;
+    }
+    return null;
+  }
+
+  function setItemState(item, isActive, isPrevious, options) {
+    const duration = options && options.animationDuration ? options.animationDuration : ANIMATION_DURATION;
+    const fadeOnly = options && options.transitionMode === 'fade';
+
+    item.classList.toggle('active', isActive);
+    item.classList.toggle('is-active', isActive);
+    item.classList.toggle('is-exiting', !isActive && isPrevious);
+
+    if (item.tagName === 'VIDEO') {
+      item.classList.toggle('active-video', isActive);
+    }
+
+    item.style.display = 'block';
+    item.style.visibility = 'visible';
+    item.style.transition = fadeOnly
+      ? 'opacity ' + duration + 'ms ease'
+      : 'opacity ' + duration + 'ms ease, transform ' + duration + 'ms ease';
+    item.style.willChange = 'opacity, transform';
+    item.style.opacity = isActive ? '1' : '0';
+    item.style.transform = fadeOnly
+      ? 'translate3d(0, 0, 0)'
+      : (isActive ? 'translateX(0) scale(1)' : (isPrevious ? 'translateX(-100%) scale(0.98)' : 'translateX(100%) scale(0.98)'));
+    item.style.zIndex = isActive ? '2' : '1';
+    item.style.pointerEvents = isActive ? 'auto' : 'none';
+
+    if (item.tagName === 'VIDEO') {
+      if (isActive) {
+        if (!options || options.type !== 'video') playVideo(item);
+      } else {
+        pauseVideo(item);
+      }
+    }
+  }
+
+  function createSequenceController(config) {
+    const root = config.root;
+    const items = toArray(config.items);
+    const dots = config.dots || [];
+
+    if (!root || items.length < 1 || root.dataset.joelAnimationBound === 'true') return null;
+    root.dataset.joelAnimationBound = 'true';
+    root.classList.add('joel-managed-root');
+
+    let index = Math.max(0, items.findIndex(function(item) {
+      return item.classList.contains('active') || item.classList.contains('active-video');
+    }));
+    if (index < 0) index = 0;
+    let activeVideo = null;
+    let videoTimer = null;
+    let videoEndedHandler = null;
+    let videoMetadataHandler = null;
+
+    function getItemVideo(item) {
+      if (!item) return null;
+      if (item.tagName === 'VIDEO') return item;
+      return item.querySelector ? item.querySelector('video') : null;
+    }
+
+    function resetManagedVideo(video) {
+      if (!video) return;
+      try { video.pause(); } catch (error) {}
+      try { video.currentTime = 0; } catch (error) {}
+    }
+
+    function clearActiveVideoSchedule(resetCurrent) {
+      if (videoTimer) {
+        window.clearTimeout(videoTimer);
+        videoTimer = null;
+      }
+
+      if (activeVideo) {
+        if (videoEndedHandler) activeVideo.removeEventListener('ended', videoEndedHandler);
+        if (videoMetadataHandler) activeVideo.removeEventListener('loadedmetadata', videoMetadataHandler);
+        if (resetCurrent) resetManagedVideo(activeVideo);
+      }
+
+      activeVideo = null;
+      videoEndedHandler = null;
+      videoMetadataHandler = null;
+    }
+
+    function getVideoDurationMs(video) {
+      return Number.isFinite(video.duration) && video.duration > 0
+        ? Math.min(video.duration * 1000, controller.maxVideoDuration)
+        : controller.maxVideoDuration;
+    }
+
+    function scheduleActiveVideo(video) {
+      if (!video) return;
+      activeVideo = video;
+      const startedAt = Date.now();
+
+      function advance() {
+        if (activeVideo !== video || controller.paused || globallyPaused) return;
+        clearActiveVideoSchedule(false);
+        resetManagedVideo(video);
+        controller.next();
+      }
+
+      function armMaxDurationTimer() {
+        if (videoTimer) window.clearTimeout(videoTimer);
+        const elapsed = Date.now() - startedAt;
+        const remaining = Math.max(0, controller.maxVideoDuration - elapsed);
+        videoTimer = window.setTimeout(advance, remaining);
+      }
+
+      videoEndedHandler = function() {
+        if (videoTimer) window.clearTimeout(videoTimer);
+        advance();
+      };
+
+      videoMetadataHandler = function() {
+        const durationMs = getVideoDurationMs(video);
+        if (typeof config.onVideoDuration === 'function') {
+          config.onVideoDuration(durationMs, controller.index, video);
+        }
+
+        if (Number.isFinite(video.duration) && video.duration > 0 && video.duration <= (controller.maxVideoDuration / 1000)) {
+          if (videoTimer) window.clearTimeout(videoTimer);
+          videoTimer = null;
+        } else {
+          armMaxDurationTimer();
+        }
+      };
+
+      video.addEventListener('ended', videoEndedHandler);
+      video.addEventListener('loadedmetadata', videoMetadataHandler);
+      armMaxDurationTimer();
+
+      if (video.readyState >= 1) {
+        videoMetadataHandler();
+      } else if (typeof config.onVideoDuration === 'function') {
+        config.onVideoDuration(controller.maxVideoDuration, controller.index, video);
+      }
+
+      setMediaDefaults(video, true);
+      resetManagedVideo(video);
+      playVideo(video);
+    }
+
+    const controller = {
+      root: root,
+      items: items,
+      dots: dots,
+      index: index,
+      visible: true,
+      hovered: false,
+      paused: false,
+      type: config.type || 'sequence',
+      interval: config.interval || SLIDE_INTERVAL,
+      maxVideoDuration: config.maxVideoDuration || MAX_VIDEO_DURATION,
+      animationDuration: config.animationDuration || ANIMATION_DURATION,
+      transitionMode: config.transitionMode || (config.type === 'video' ? 'fade' : 'slide'),
+      lastTick: Date.now(),
+      show: function(nextIndex) {
+        if (!items.length) return;
+        if (controller.type === 'video') {
+          clearActiveVideoSchedule(false);
+          items.forEach(function(item) {
+            const video = getItemVideo(item);
+            if (video) resetManagedVideo(video);
+          });
+        }
+
+        const previousIndex = controller.index;
+        controller.index = (nextIndex + items.length) % items.length;
+        controller.lastTick = Date.now();
+        items.forEach(function(item, itemIndex) {
+          setItemState(item, itemIndex === controller.index, itemIndex === previousIndex, controller);
+          const media = item.matches && item.matches('img, video') ? item : item.querySelector && item.querySelector('img, video');
+          setMediaDefaults(media, itemIndex === controller.index || itemIndex === (controller.index + 1) % items.length);
+        });
+        dots.forEach(function(dot, dotIndex) {
+          dot.classList.toggle('active', dotIndex === controller.index);
+          dot.setAttribute('aria-current', dotIndex === controller.index ? 'true' : 'false');
+        });
+        if (typeof config.onShow === 'function') config.onShow(controller.index);
+        if (controller.type === 'video' && !controller.paused && !globallyPaused) {
+          scheduleActiveVideo(getItemVideo(items[controller.index]));
+        }
+      },
+      next: function() {
+        controller.show(controller.index + 1);
+      },
+      prev: function() {
+        controller.show(controller.index - 1);
+      },
+      tick: function() {
+        if (controller.type === 'video') return;
+        if (!controller.visible || controller.hovered || controller.paused || globallyPaused) return;
+        if (items.length > 1 && Date.now() - controller.lastTick >= controller.interval) controller.next();
+      },
+      pause: function() {
+        controller.paused = true;
+        if (controller.type === 'video') clearActiveVideoSchedule(false);
+        items.forEach(pauseVideo);
+      },
+      resume: function() {
+        controller.paused = false;
+        if (controller.visible) controller.show(controller.index);
+      },
+      reset: function() {
+        controller.show(0);
+      }
+    };
+
+    root.addEventListener('mouseenter', function() { controller.hovered = true; });
+    root.addEventListener('mouseleave', function() { controller.hovered = false; });
+    root.addEventListener('focusin', function() { controller.hovered = true; });
+    root.addEventListener('focusout', function() { controller.hovered = false; });
+
+    dots.forEach(function(dot, dotIndex) {
+      dot.style.cursor = 'pointer';
+      dot.addEventListener('click', function() { controller.show(dotIndex); });
+    });
+
+    const prevButton = config.prevButton || findControlButton(root, '.slider-prev, .carousel-prev, .prev-btn, [data-slider-prev], [data-carousel-prev], [aria-label*="Previous"]');
+    const nextButton = config.nextButton || findControlButton(root, '.slider-next, .carousel-next, .next-btn, [data-slider-next], [data-carousel-next], [aria-label*="Next"]');
+    if (prevButton) prevButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      controller.prev();
+    });
+    if (nextButton) nextButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      controller.next();
+    });
+
+    if (typeof addSwipeNavigation === 'function') {
+      addSwipeNavigation(root, {
+        next: controller.next,
+        prev: controller.prev,
+        pause: function() { controller.hovered = true; },
+        resume: function() { controller.hovered = false; }
+      });
+    }
+
+    controller.show(index);
+    return controller;
+  }
+
+  function createBusinessController() {
+    const track = document.getElementById('businessCardsTrack');
+    if (!track || track.dataset.joelAnimationBound === 'true') return null;
+
+    const cards = toArray(track.querySelectorAll('.business-card'));
+    const viewport = track.parentElement;
+    const root = track.closest('.business-slider-wrapper') || viewport || track;
+    if (!cards.length || !viewport) return null;
+
+    track.dataset.joelAnimationBound = 'true';
+    root.classList.add('joel-managed-root');
+
+    let index = window.innerWidth <= 768 ? 0 : Math.min(2, cards.length - 1);
+    const controller = {
+      root: root,
+      visible: true,
+      hovered: false,
+      paused: false,
+      show: function(nextIndex) {
+        index = (nextIndex + cards.length) % cards.length;
+        cards.forEach(function(card, cardIndex) {
+          card.classList.toggle('active', cardIndex === index);
+          card.classList.toggle('is-active', cardIndex === index);
+        });
+        const activeCard = cards[index];
+        const maxOffset = Math.max(0, track.scrollWidth - viewport.clientWidth);
+        const centeredOffset = activeCard ? activeCard.offsetLeft - ((viewport.clientWidth - activeCard.offsetWidth) / 2) : 0;
+        const offset = Math.max(0, Math.min(centeredOffset, maxOffset));
+        track.style.transition = 'transform ' + ANIMATION_DURATION + 'ms cubic-bezier(0.22, 1, 0.36, 1)';
+        track.style.transform = 'translate3d(' + (-offset) + 'px, 0, 0)';
+      },
+      next: function() { controller.show(index + 1); },
+      prev: function() { controller.show(index - 1); },
+      tick: function() {
+        if (!controller.visible || controller.hovered || controller.paused || globallyPaused) return;
+        controller.next();
+      },
+      pause: function() { controller.paused = true; },
+      resume: function() { controller.paused = false; },
+      reset: function() { controller.show(window.innerWidth <= 768 ? 0 : Math.min(2, cards.length - 1)); }
+    };
+
+    const prev = document.getElementById('businessPrev');
+    const next = document.getElementById('businessNext');
+    if (prev) prev.addEventListener('click', function(event) {
+      event.preventDefault();
+      controller.prev();
+    });
+    if (next) next.addEventListener('click', function(event) {
+      event.preventDefault();
+      controller.next();
+    });
+
+    root.addEventListener('mouseenter', function() { controller.hovered = true; });
+    root.addEventListener('mouseleave', function() { controller.hovered = false; });
+    window.addEventListener('resize', function() { controller.show(index); });
+
+    if (typeof addSwipeNavigation === 'function') {
+      addSwipeNavigation(viewport, {
+        next: controller.next,
+        prev: controller.prev,
+        pause: function() { controller.hovered = true; },
+        resume: function() { controller.hovered = false; }
+      });
+    }
+
+    controller.show(index);
+    return controller;
+  }
+
+  function createCeoBioController() {
+    const root = document.querySelector('.ceo-bio-container');
+    if (!root || root.dataset.joelAnimationBound === 'true') return null;
+    const bios = toArray(root.querySelectorAll('.ceo-bio'));
+    if (bios.length < 2) return null;
+
+    root.dataset.joelAnimationBound = 'true';
+    let index = Math.max(0, bios.findIndex(function(bio) { return bio.classList.contains('active'); }));
+    if (index < 0) index = 0;
+
+    const controller = {
+      root: root,
+      visible: true,
+      hovered: false,
+      paused: false,
+      show: function(nextIndex) {
+        index = (nextIndex + bios.length) % bios.length;
+        bios.forEach(function(bio, bioIndex) {
+          bio.classList.toggle('active', bioIndex === index);
+          bio.style.transition = 'opacity ' + ANIMATION_DURATION + 'ms ease, transform ' + ANIMATION_DURATION + 'ms ease';
+          bio.style.opacity = bioIndex === index ? '1' : '0';
+          bio.style.transform = bioIndex === index ? 'translateX(0)' : 'translateX(18px)';
+          bio.style.position = bioIndex === index ? 'relative' : 'absolute';
+          bio.style.inset = bioIndex === index ? '' : '0 auto auto 0';
+          bio.style.pointerEvents = bioIndex === index ? 'auto' : 'none';
+        });
+      },
+      next: function() { controller.show(index + 1); },
+      tick: function() {
+        if (!controller.visible || controller.hovered || controller.paused || globallyPaused) return;
+        controller.next();
+      },
+      pause: function() { controller.paused = true; },
+      resume: function() { controller.paused = false; },
+      reset: function() { controller.show(0); }
+    };
+
+    root.addEventListener('mouseenter', function() { controller.hovered = true; });
+    root.addEventListener('mouseleave', function() { controller.hovered = false; });
+    controller.show(index);
+    return controller;
+  }
+
+  function createCoreValuesPremiumController() {
+    const imagePanel = document.querySelector('.cv-image-panel');
+    const cardsPanel = document.querySelector('.cv-cards-panel');
+    const slides = toArray(document.querySelectorAll('.cv-image-slide'));
+    const cards = toArray(document.querySelectorAll('.cv-card'));
+    const overlayLabel = document.querySelector('.cv-overlay-label');
+    const progressBar = document.querySelector('.cv-progress-bar');
+    const section = imagePanel ? imagePanel.closest('.cv-section') : null;
+    const root = section || imagePanel;
+
+    if (!root || !imagePanel || !cardsPanel || slides.length < 1 || cards.length < 1 || root.dataset.joelAnimationBound === 'true') return null;
+
+    root.dataset.joelAnimationBound = 'true';
+    root.classList.add('joel-managed-root', 'joel-cv-root');
+
+    const labels = cards.map(function(card, cardIndex) {
+      const title = card.querySelector('.cv-card-title');
+      return title ? title.textContent.trim() : (slides[cardIndex] ? slides[cardIndex].alt : '');
+    });
+
+    let index = Math.max(0, slides.findIndex(function(slide) { return slide.classList.contains('active'); }));
+
+    const controller = {
+      root: root,
+      visible: true,
+      hovered: false,
+      paused: false,
+      show: function(nextIndex) {
+        const previousIndex = index;
+        index = (nextIndex + slides.length) % slides.length;
+
+        slides.forEach(function(slide, slideIndex) {
+          const isActive = slideIndex === index;
+          const isPrevious = slideIndex === previousIndex && slideIndex !== index;
+          slide.classList.toggle('active', isActive);
+          slide.classList.toggle('is-active', isActive);
+          slide.classList.toggle('is-exiting', isPrevious);
+          slide.style.display = 'block';
+          slide.style.visibility = 'visible';
+          slide.style.transition = 'opacity ' + ANIMATION_DURATION + 'ms ease, transform ' + ANIMATION_DURATION + 'ms cubic-bezier(0.22, 1, 0.36, 1)';
+          slide.style.opacity = isActive ? '1' : '0';
+          slide.style.transform = isActive ? 'translateX(0) scale(1)' : (isPrevious ? 'translateX(-100%) scale(0.98)' : 'translateX(100%) scale(0.98)');
+          slide.style.zIndex = isActive ? '2' : '1';
+          setMediaDefaults(slide, isActive || slideIndex === (index + 1) % slides.length);
+        });
+
+        cards.forEach(function(card, cardIndex) {
+          card.classList.toggle('active', cardIndex === index);
+          card.classList.toggle('is-active', cardIndex === index);
+        });
+
+        if (overlayLabel) overlayLabel.textContent = labels[index] || '';
+        if (progressBar) {
+          progressBar.classList.remove('animating');
+          progressBar.style.animation = 'none';
+          progressBar.offsetHeight;
+          progressBar.style.animation = 'cvProgressAnimation ' + SLIDE_INTERVAL + 'ms linear forwards';
+          progressBar.classList.add('animating');
+        }
+      },
+      next: function() { controller.show(index + 1); },
+      prev: function() { controller.show(index - 1); },
+      tick: function() {
+        if (!controller.visible || controller.hovered || controller.paused || globallyPaused) return;
+        if (slides.length > 1) controller.next();
+      },
+      pause: function() { controller.paused = true; },
+      resume: function() { controller.paused = false; },
+      reset: function() { controller.show(0); }
+    };
+
+    [imagePanel, cardsPanel].forEach(function(panel) {
+      panel.addEventListener('mouseenter', function() { controller.hovered = true; });
+      panel.addEventListener('mouseleave', function() { controller.hovered = false; });
+      panel.addEventListener('focusin', function() { controller.hovered = true; });
+      panel.addEventListener('focusout', function() { controller.hovered = false; });
+    });
+
+    cards.forEach(function(card, cardIndex) {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function() {
+        controller.show(cardIndex);
+      });
+    });
+
+    controller.show(index);
+    return controller;
+  }
+
+  function bindVisibilityObserver() {
+    if (!('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        const controller = controllers.find(function(candidate) {
+          return candidate.root === entry.target;
+        });
+        if (!controller) return;
+        controller.visible = entry.isIntersecting && entry.intersectionRatio > 0.15;
+        if (controller.visible) {
+          controller.resume();
+        } else {
+          controller.pause();
+        }
+      });
+    }, {
+      threshold: [0, 0.15, 0.4],
+      rootMargin: '120px 0px'
+    });
+
+    controllers.forEach(function(controller) {
+      observer.observe(controller.root);
+    });
+  }
+
+  function register(controller) {
+    if (controller) controllers.push(controller);
+  }
+
+  function registerSequence(root, itemSelector, dotSelector, options) {
+    if (!root) return;
+    const items = toArray(root.querySelectorAll(itemSelector));
+    if (!items.length) return;
+    register(createSequenceController(Object.assign({
+      root: root,
+      items: items,
+      dots: findDots(root, dotSelector || '.indicator, [class*="dot"]')
+    }, options || {})));
+  }
+
+  function initializeControllers() {
+    document.querySelectorAll('img').forEach(function(img, index) {
+      setMediaDefaults(img, index < 8);
+    });
+
+    document.querySelectorAll('video').forEach(function(video, index) {
+      setMediaDefaults(video, index < 2);
+    });
+
+    register(createCeoBioController());
+    register(createBusinessController());
+    register(createCoreValuesPremiumController());
+
+    document.querySelectorAll('.hero-video-cycle').forEach(function(root) {
+      const videos = toArray(root.querySelectorAll('video'));
+      if (videos.length === 0) return;
+      if (root.id === 'heroVideoCarousel') {
+        root.classList.add('visible');
+        const heroImage = document.getElementById('heroImageMain');
+        if (heroImage) heroImage.classList.add('hidden');
+      }
+      register(createSequenceController({
+        root: root,
+        items: videos,
+        dots: findDots(root, '.about-hero-dot, .services-hero-dot, .leadership-hero-dot, .ccv-dot, .indicator'),
+        type: 'video',
+        maxVideoDuration: MAX_VIDEO_DURATION
+      }));
+    });
+
+    const contactCycle = document.getElementById('contactVideoCycle');
+    if (contactCycle && contactCycle.dataset.joelAnimationBound !== 'true') {
+      const contactController = createSequenceController({
+        root: contactCycle,
+        items: toArray(contactCycle.querySelectorAll('.contact-cycle-vid')),
+        dots: toArray(contactCycle.querySelectorAll('.ccv-dot')),
+        type: 'video',
+        maxVideoDuration: MAX_VIDEO_DURATION,
+        animationDuration: 800,
+        transitionMode: 'fade',
+        onShow: function(index) {
+          const counter = contactCycle.querySelector('#ccvCounter');
+          const progress = contactCycle.querySelector('#ccvProgressBar');
+          if (counter) counter.textContent = (index + 1) + ' / ' + contactCycle.querySelectorAll('.contact-cycle-vid').length;
+          if (progress) progress.style.animation = 'none';
+        },
+        onVideoDuration: function(durationMs) {
+          const progress = contactCycle.querySelector('#ccvProgressBar');
+          if (progress) {
+            progress.style.animation = 'none';
+            progress.offsetHeight;
+            progress.style.animation = 'ccvProgressAnimation ' + durationMs + 'ms linear forwards';
+          }
+        }
+      });
+
+      const contactControl = document.getElementById('ccvControlBtn');
+      const contactControlIcon = document.getElementById('ccvCtrlIcon');
+      if (contactControl && contactController) {
+        contactControl.addEventListener('click', function(event) {
+          event.preventDefault();
+          contactController.paused = !contactController.paused;
+          if (contactController.paused) {
+            contactController.items.forEach(pauseVideo);
+            contactControl.setAttribute('aria-label', 'Play video');
+            if (contactControlIcon) contactControlIcon.textContent = '▶';
+          } else {
+            contactController.show(contactController.index);
+            contactControl.setAttribute('aria-label', 'Pause video');
+            if (contactControlIcon) contactControlIcon.textContent = '⏸';
+          }
+        });
+      }
+
+      register(contactController);
+    }
+
+    document.querySelectorAll('.carousel-container').forEach(function(root) {
+      registerSequence(root, '.carousel-slide', '.indicator');
+    });
+
+    document.querySelectorAll('.image-carousel .carousel-wrapper').forEach(function(root) {
+      registerSequence(root, '.carousel-slide', '.indicator');
+    });
+
+    document.querySelectorAll('.mission-slider .slider-container, .vision-slider .slider-container').forEach(function(root) {
+      registerSequence(root, '.slide', '.indicator, [class*="dot"]');
+    });
+
+    document.querySelectorAll('.values-slider .slider-container').forEach(function(root) {
+      registerSequence(root, '.slider-slide', '.indicator, [class*="dot"]');
+    });
+
+    document.querySelectorAll('.terms-hero-media').forEach(function(root) {
+      registerSequence(root, '.terms-image', '.terms-dot');
+    });
+
+    document.querySelectorAll('.privacy-hero-media').forEach(function(root) {
+      registerSequence(root, '.privacy-image', '.privacy-dot');
+    });
+
+    document.querySelectorAll('.chm-img-panel').forEach(function(root) {
+      registerSequence(root, '.chm-slide', '.indicator, [class*="dot"]');
+    });
+
+    const flip = document.getElementById('aboutHeroFlip');
+    if (flip) {
+      const img = flip.querySelector('.flip-card-image');
+      if (img) {
+        const sources = ['assets/images/about-preview.jpg', 'assets/images/about-preview2.jpg', 'assets/images/about-preview4.jpg'];
+        const proxyItems = sources.map(function(src) {
+          const item = document.createElement('span');
+          item.dataset.src = src;
+          return item;
+        });
+        register(createSequenceController({
+          root: flip,
+          items: proxyItems,
+          dots: [],
+          onShow: function(index) {
+            img.style.transition = 'opacity ' + (ANIMATION_DURATION / 2) + 'ms ease, transform ' + ANIMATION_DURATION + 'ms ease';
+            img.style.opacity = '0';
+            img.style.transform = 'translateX(-24px) scale(0.98)';
+            window.setTimeout(function() {
+              img.src = sources[index];
+              img.style.opacity = '1';
+              img.style.transform = 'translateX(0) scale(1)';
+            }, ANIMATION_DURATION / 2);
+          }
+        }));
+      }
+    }
+
+    bindVisibilityObserver();
+    resetAnimations();
+    startAnimations();
+  }
+
+  function tickControllers() {
+    controllers.forEach(function(controller) {
+      if (controller && typeof controller.tick === 'function') controller.tick();
+    });
+  }
+
+  function startAnimations() {
+    globallyPaused = false;
+    if (masterTimer) window.clearInterval(masterTimer);
+    masterTimer = window.setInterval(tickControllers, TICK_INTERVAL);
+    controllers.forEach(function(controller) {
+      if (controller.visible && typeof controller.resume === 'function') controller.resume();
+    });
+  }
+
+  function pauseAnimations() {
+    globallyPaused = true;
+    controllers.forEach(function(controller) {
+      if (typeof controller.pause === 'function') controller.pause();
+    });
+  }
+
+  function resumeAnimations() {
+    globallyPaused = false;
+    controllers.forEach(function(controller) {
+      if (typeof controller.resume === 'function') controller.resume();
+    });
+  }
+
+  function resetAnimations() {
+    controllers.forEach(function(controller) {
+      if (typeof controller.reset === 'function') controller.reset();
+    });
+  }
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      pauseAnimations();
+    } else {
+      resumeAnimations();
+    }
+  });
+
+  window.JOELAnimationManager = {
+    controllers: controllers,
+    startAnimations: startAnimations,
+    pauseAnimations: pauseAnimations,
+    resumeAnimations: resumeAnimations,
+    resetAnimations: resetAnimations
+  };
+
+  window.startAnimations = startAnimations;
+  window.pauseAnimations = pauseAnimations;
+  window.resumeAnimations = resumeAnimations;
+  window.resetAnimations = resetAnimations;
+  window.consultantWebsite = Object.assign(window.consultantWebsite || {}, window.JOELAnimationManager);
+
+  ready(initializeControllers);
+})();
+
+// === GLOBAL IMAGE ERROR HANDLER ===
+(function() {
+  'use strict';
+
+  function attachImageErrorHandlers() {
+    document.querySelectorAll('img').forEach(function(img) {
+      if (img.dataset.errHandled) return;
+      img.dataset.errHandled = '1';
+
+      // Force display visible
+      img.style.display = 'block';
+      img.style.opacity = '1';
+      img.style.visibility = 'visible';
+      img.style.minHeight = '20px';
+
+      img.addEventListener('error', function() {
+        console.warn('[IMG ERROR] Failed to load:', img.src || img.currentSrc || '(no src)');
+        // Show a dark placeholder so layout doesn't collapse
+        img.style.background = '#0a1f4e';
+        img.style.minHeight = '200px';
+        img.style.display = 'block';
+      });
+
+      img.addEventListener('load', function() {
+        img.style.opacity = '1';
+        img.style.visibility = 'visible';
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachImageErrorHandlers);
+  } else {
+    attachImageErrorHandlers();
+  }
+
+  // Re-run at 1s to catch dynamically added images
+  setTimeout(attachImageErrorHandlers, 1000);
+})();
+
+// === GLOBAL VIDEO AUTOPLAY ENFORCER ===
+(function() {
+  'use strict';
+
+  function enforceVideoAutoplay() {
+    document.querySelectorAll('video').forEach(function(video) {
+      if (video.dataset.autoplayEnforced) return;
+      video.dataset.autoplayEnforced = '1';
+
+      const isManagedCarouselVideo =
+        video.classList.contains('hero-cycle-video') ||
+        video.classList.contains('contact-cycle-vid') ||
+        video.closest('#heroVideoCarousel');
+      const isActiveManagedVideo =
+        video.classList.contains('active') ||
+        video.classList.contains('active-video');
+
+      // Ensure required attributes
+      video.muted = true;
+      video.defaultMuted = true;
+      video.loop = false;
+      video.playsInline = true;
+      video.autoplay = true;
+      video.removeAttribute('loop');
+      video.setAttribute('muted', '');
+      video.setAttribute('autoplay', '');
+      video.setAttribute('playsinline', '');
+
+      // If video has a poster, use it as a CSS fallback background
+      if (video.poster) {
+        video.style.setProperty('--video-poster', 'url("' + video.poster + '")');
+        video.style.background = 'url("' + video.poster + '") center/cover no-repeat #040f2e';
+      }
+
+      if (isManagedCarouselVideo && !isActiveManagedVideo) return;
+
+      // Attempt to play
+      var playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(function() {
+          // Autoplay blocked — show poster as background
+          video.classList.add('video-fallback-active');
+          if (video.poster) {
+            video.style.backgroundImage = 'url("' + video.poster + '")';
+            video.style.backgroundSize = 'cover';
+            video.style.backgroundPosition = 'center';
+          }
+          // Try again on user interaction
+          document.addEventListener('click', function tryPlay() {
+            var isManagedCarouselVideo =
+              video.classList.contains('hero-cycle-video') ||
+              video.classList.contains('contact-cycle-vid') ||
+              video.closest('#heroVideoCarousel');
+            var isActiveManagedVideo =
+              video.classList.contains('active') ||
+              video.classList.contains('active-video');
+            if (!isManagedCarouselVideo || isActiveManagedVideo) {
+              video.play().catch(function() {});
+            }
+            document.removeEventListener('click', tryPlay);
+          }, { once: true });
+        });
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enforceVideoAutoplay);
+  } else {
+    enforceVideoAutoplay();
+  }
+
+  // Re-enforce at 1.5s to catch any late-rendered videos
+  setTimeout(enforceVideoAutoplay, 1500);
+})();
+
 // === PRODUCTION VIDEO DELIVERY FALLBACK ===
 (function() {
   const GITHUB_MEDIA_BASE = 'https://media.githubusercontent.com/media/PhilipCobbinah/consultant-site/main/';
@@ -98,7 +1247,16 @@
   }
 
   function playWhenReady(video) {
-    if (!video.autoplay && !video.classList.contains('active-video')) return;
+    const isManagedCarouselVideo =
+      video.classList.contains('hero-cycle-video') ||
+      video.classList.contains('contact-cycle-vid') ||
+      video.closest('#heroVideoCarousel');
+    const isActiveManagedVideo =
+      video.classList.contains('active') ||
+      video.classList.contains('active-video');
+
+    if (isManagedCarouselVideo && !isActiveManagedVideo) return;
+    if (!video.autoplay && !isActiveManagedVideo) return;
 
     video.muted = true;
     video.playsInline = true;
@@ -191,18 +1349,37 @@
       '.contact-hero video, .about-hero video, .services-hero video, .leadership-hero video, .hero video, [class*="hero"] video, [class*="-hero"] video'
     );
     heroVideos.forEach(function(video) {
+      const isManagedCarouselVideo =
+        video.classList.contains('hero-cycle-video') ||
+        video.classList.contains('contact-cycle-vid') ||
+        video.closest('#heroVideoCarousel');
+      const isActiveManagedVideo =
+        video.classList.contains('active') ||
+        video.classList.contains('active-video');
       video.muted = true;
+      video.defaultMuted = true;
       video.autoplay = true;
-      video.loop = true;
+      video.loop = false;
       video.playsInline = true;
       video.preload = 'auto';
+      video.removeAttribute('loop');
+      video.setAttribute('muted', '');
+      video.setAttribute('autoplay', '');
+      video.setAttribute('playsinline', '');
+      if (isManagedCarouselVideo && !isActiveManagedVideo) return;
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(function() {
           // Retry on user interaction if autoplay blocked
-          document.addEventListener('click', function() { video.play(); }, { once: true });
-          document.addEventListener('touchstart', function() { video.play(); }, { once: true });
-          document.addEventListener('scroll', function() { video.play(); }, { once: true });
+          function retryHeroVideoPlay() {
+            if (!isManagedCarouselVideo || video.classList.contains('active') || video.classList.contains('active-video')) {
+              video.play().catch(function() {});
+            }
+          }
+
+          document.addEventListener('click', retryHeroVideoPlay, { once: true });
+          document.addEventListener('touchstart', retryHeroVideoPlay, { once: true });
+          document.addEventListener('scroll', retryHeroVideoPlay, { once: true });
         });
       }
     });
@@ -216,60 +1393,6 @@
 
   // Also try again after full page load (images, scripts done)
   window.addEventListener('load', forcePlayAllHeroVideos);
-})();
-
-// === HERO VIDEO CYCLING (10 seconds per video) ===
-(function() {
-  function initHeroVideoCycle() {
-    const cycleContainers = document.querySelectorAll('.hero-video-cycle');
-    
-    cycleContainers.forEach(function(container) {
-      const videos = container.querySelectorAll('.hero-cycle-video');
-      if (!videos.length) return;
-      
-      let currentIndex = 0;
-      
-      // Play first video immediately
-      function playVideo(index) {
-        videos.forEach(function(v, i) {
-          v.classList.remove('active-video');
-          if (i !== index) {
-            v.pause();
-            v.currentTime = 0;
-          }
-        });
-        
-        const current = videos[index];
-        current.muted = true;
-        current.currentTime = 0;
-        current.classList.add('active-video');
-        
-        const playPromise = current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(function() {
-            document.addEventListener('click', function() { current.play(); }, { once: true });
-          });
-        }
-      }
-      
-      // Start first video
-      playVideo(0);
-      
-      // Cycle every 10 seconds
-      setInterval(function() {
-        currentIndex = (currentIndex + 1) % videos.length;
-        playVideo(currentIndex);
-      }, 10000);
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initHeroVideoCycle);
-  } else {
-    initHeroVideoCycle();
-  }
-
-  window.addEventListener('load', initHeroVideoCycle);
 })();
 
 // Main JavaScript for Consultant Website
@@ -423,7 +1546,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Wait 500ms, then swap text and fade back in
             setTimeout(() => {
                 bioElement.textContent = bioSnippets[currentBioIndex];
-                
+
                 // Fade in new text (0.5s transition)
                 bioElement.style.opacity = '1';
                 bioElement.style.transition = 'opacity 0.5s ease-in-out';
@@ -434,318 +1557,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Start rotation every 4 seconds
-        setInterval(rotateCeoBio, 4000);
+        if (!window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) {
+            setInterval(rotateCeoBio, 4000);
+        }
     }
 
-    // Hero Image + Video Carousel - Show image for 10s, then 3 videos for 10s each, then loop
-    (function initHeroMediaCarousel() {
-        const heroImage = document.getElementById('heroImageMain');
-        const heroVideoCarousel = document.getElementById('heroVideoCarousel');
-        const videos = heroVideoCarousel.querySelectorAll('.hero-video');
-        const playPauseBtn = document.getElementById('heroVideoPausePlay');
-        const progressBar = heroVideoCarousel.querySelector('.progress-fill');
-        const currentTimeEl = heroVideoCarousel.querySelector('.current-time');
-        
-        if (!heroImage || !heroVideoCarousel || videos.length === 0) return;
-
-        let isPlaying = true;
-        let autoplayInterval;
-        let globalTimer = 0; // 0-10: image, 10-20: video1, 20-30: video2, 30-40: video3, repeat
-        const TOTAL_CYCLE = 40; // Total seconds before loop (10 image + 30 videos)
-        const ITEM_DURATION = 10; // Each item plays for 10 seconds
-
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        function updateDisplay() {
-            const cyclePosition = globalTimer % TOTAL_CYCLE;
-            
-            // Determine what should be shown
-            if (cyclePosition < 10) {
-                // Show image (0-10 seconds)
-                heroImage.classList.remove('hidden');
-                heroVideoCarousel.classList.remove('visible');
-                progressBar.style.width = (cyclePosition / 10) * 100 + '%';
-                currentTimeEl.textContent = formatTime(cyclePosition);
-            } else {
-                // Show videos (10-40 seconds)
-                heroImage.classList.add('hidden');
-                heroVideoCarousel.classList.add('visible');
-                
-                const videoPhase = Math.floor((cyclePosition - 10) / 10); // 0, 1, or 2
-                const videoTime = (cyclePosition - 10) % 10; // 0-10 within this video
-                
-                // Show appropriate video
-                videos.forEach((video, i) => {
-                    video.classList.toggle('active', i === videoPhase);
-                    if (i === videoPhase) {
-                        video.currentTime = videoTime;
-                        if (isPlaying) {
-                            video.play().catch(err => console.log('Autoplay prevented:', err));
-                        } else {
-                            video.pause();
-                        }
-                    }
-                });
-                
-                progressBar.style.width = (videoTime / 10) * 100 + '%';
-                currentTimeEl.textContent = formatTime(videoTime);
-            }
-        }
-
-        function togglePlayPause() {
-            isPlaying = !isPlaying;
-            const cyclePosition = globalTimer % TOTAL_CYCLE;
-            
-            if (isPlaying) {
-                // Resume playing
-                if (cyclePosition >= 10) {
-                    const videoPhase = Math.floor((cyclePosition - 10) / 10);
-                    videos[videoPhase].play().catch(err => console.log('Autoplay prevented:', err));
-                }
-                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                startAutoplay();
-            } else {
-                // Pause
-                videos.forEach(video => video.pause());
-                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-                clearInterval(autoplayInterval);
-            }
-        }
-
-        function startAutoplay() {
-            autoplayInterval = setInterval(() => {
-                if (isPlaying) {
-                    globalTimer++;
-                    updateDisplay();
-                }
-            }, 1000);
-        }
-
-        // Event listeners
-        playPauseBtn.addEventListener('click', togglePlayPause);
-
-        // Progress bar click to seek (within current item)
-        heroVideoCarousel.querySelector('.video-progress-bar').addEventListener('click', (e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
-            const cyclePosition = globalTimer % TOTAL_CYCLE;
-            
-            if (cyclePosition >= 10) {
-                const videoPhase = Math.floor((cyclePosition - 10) / 10);
-                videos[videoPhase].currentTime = percent * ITEM_DURATION;
-            }
-        });
-
-        // Initialize
-        updateDisplay();
-        startAutoplay();
-    })();
-
-    // Services Hero Video Carousel - 5 videos, 10 seconds each, auto-play on page load
-    (function initServicesHeroVideoCarousel() {
-        const videosContainer = document.getElementById('servicesHeroVideos');
-        if (!videosContainer) return;
-
-        const videos = videosContainer.querySelectorAll('.services-hero-video');
-        const dots = document.querySelectorAll('.services-hero-dot');
-        
-        if (videos.length === 0 || dots.length === 0) return;
-
-        let currentVideoIndex = 0;
-        let autoplayInterval;
-        let isPlaying = true;
-        let videoTimer = 0;
-
-        function updateDisplay() {
-            videos.forEach((video, index) => {
-                video.classList.toggle('active', index === currentVideoIndex);
-            });
-
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentVideoIndex);
-            });
-
-            const currentVideo = videos[currentVideoIndex];
-            if (videoTimer === 0) {
-                currentVideo.currentTime = 0;
-                if (isPlaying) {
-                    currentVideo.play().catch(err => console.log('Autoplay prevented:', err));
-                }
-            }
-        }
-
-        function nextVideo() {
-            currentVideoIndex = (currentVideoIndex + 1) % videos.length;
-            videoTimer = 0;
-            updateDisplay();
-        }
-
-        function startAutoplay() {
-            autoplayInterval = setInterval(() => {
-                if (isPlaying) {
-                    videoTimer++;
-                    if (videoTimer >= 10) {
-                        nextVideo();
-                    }
-                }
-            }, 1000);
-        }
-
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                currentVideoIndex = index;
-                videoTimer = 0;
-                updateDisplay();
-            });
-        });
-
-        updateDisplay();
-        startAutoplay();
-    })();
-
-    (function initAboutHeroVideoCarousel() {
-        const videosContainer = document.getElementById('aboutHeroVideos');
-        if (!videosContainer) return;
-
-        const videos = videosContainer.querySelectorAll('.about-hero-video');
-        const dots = document.querySelectorAll('.about-hero-dot');
-        
-        if (videos.length === 0 || dots.length === 0) return;
-
-        let currentVideoIndex = 0;
-        let autoplayInterval;
-        let isPlaying = true;
-        let videoTimer = 0; // Track time within current video
-
-        function updateDisplay() {
-            // Hide all videos, show only current
-            videos.forEach((video, index) => {
-                video.classList.toggle('active', index === currentVideoIndex);
-            });
-
-            // Update dots
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentVideoIndex);
-            });
-
-            // Reset video and play if we just switched
-            const currentVideo = videos[currentVideoIndex];
-            if (videoTimer === 0) {
-                currentVideo.currentTime = 0;
-                if (isPlaying) {
-                    currentVideo.play().catch(err => console.log('Autoplay prevented:', err));
-                }
-            }
-        }
-
-        function nextVideo() {
-            currentVideoIndex = (currentVideoIndex + 1) % videos.length;
-            videoTimer = 0;
-            updateDisplay();
-        }
-
-        function startAutoplay() {
-            autoplayInterval = setInterval(() => {
-                if (isPlaying) {
-                    videoTimer++;
-                    if (videoTimer >= 10) {
-                        nextVideo();
-                    }
-                }
-            }, 1000);
-        }
-
-        // Click on dots to jump to that video
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                currentVideoIndex = index;
-                videoTimer = 0;
-                updateDisplay();
-            });
-        });
-
-        // Initialize
-        updateDisplay();
-        startAutoplay();
-    })();
-
-    (function initLeadershipHeroVideoCarousel() {
-        const videosContainer = document.getElementById('leadershipHeroVideos');
-        if (!videosContainer) return;
-
-        const videos = videosContainer.querySelectorAll('.leadership-hero-video');
-        const dots = document.querySelectorAll('.leadership-hero-dot');
-        
-        if (videos.length === 0) return;
-
-        let currentVideoIndex = 0;
-        let autoplayInterval;
-        let isPlaying = true;
-        let videoTimer = 0;
-
-        function updateDisplay() {
-            // Hide all videos, show only current
-            videos.forEach((video, index) => {
-                video.classList.toggle('active', index === currentVideoIndex);
-            });
-
-            // Update dots if they exist
-            if (dots.length > 0) {
-                dots.forEach((dot, index) => {
-                    dot.classList.toggle('active', index === currentVideoIndex);
-                });
-            }
-
-            // Reset video and play if we just switched
-            const currentVideo = videos[currentVideoIndex];
-            if (videoTimer === 0) {
-                currentVideo.currentTime = 0;
-                if (isPlaying) {
-                    currentVideo.play().catch(err => console.log('Autoplay prevented:', err));
-                }
-            }
-        }
-
-        function nextVideo() {
-            currentVideoIndex = (currentVideoIndex + 1) % videos.length;
-            videoTimer = 0;
-            updateDisplay();
-        }
-
-        function startAutoplay() {
-            autoplayInterval = setInterval(() => {
-                if (isPlaying) {
-                    videoTimer++;
-                    if (videoTimer >= 10) {
-                        nextVideo();
-                    }
-                }
-            }, 1000);
-        }
-
-        // Click on dots to jump to that video
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                currentVideoIndex = index;
-                videoTimer = 0;
-                updateDisplay();
-            });
-        });
-
-        // Initialize
-        updateDisplay();
-        startAutoplay();
-    })();
-
     const carouselContainer = document.querySelector('.carousel-container');
-    if (carouselContainer) {
+    if (carouselContainer && !window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) {
         const slides = carouselContainer.querySelectorAll('.carousel-slide');
         const indicators = carouselContainer.querySelectorAll('.indicator');
-        
+
+        console.log('Carousel initialized with', slides.length, 'slides');
+
+        // Force eager loading and log image sources
+        slides.forEach((slide, index) => {
+            const img = slide.querySelector('img');
+            if (img) {
+                img.loading = 'eager';
+                console.log('Slide', index, 'image src:', img.src);
+            }
+        });
+
         // Define enter/exit animation directions for each slide
         const slideAnimations = [
             { enter: 'enterFromLeft', exit: 'exitToRight' },    // Slide 0
@@ -754,7 +1586,7 @@ document.addEventListener('DOMContentLoaded', function() {
             { enter: 'enterFromBottom', exit: 'exitToTop' },    // Slide 3
             { enter: 'enterFromLeft', exit: 'exitToRight' }     // Slide 4
         ];
-        
+
         let currentSlide = 0;
         let isAnimating = false;
 
@@ -780,16 +1612,16 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 // Hide current slide and remove animation classes
                 currentElement.classList.remove('active', currentAnimations.exit);
-                
+
                 // Show next slide and apply enter animation
                 nextElement.classList.add('active', nextAnimations.enter);
-                
+
                 // Update indicators
                 updateIndicators(newIndex);
-                
+
                 // Update current slide index
                 currentSlide = newIndex;
-                
+
                 // Remove enter animation after it completes so next transition is clean
                 setTimeout(() => {
                     nextElement.classList.remove(nextAnimations.enter);
@@ -870,12 +1702,21 @@ document.addEventListener('DOMContentLoaded', function() {
         entries.forEach(function(entry) {
           if (entry.isIntersecting) {
             const vid = entry.target;
+            const isManagedCarouselVideo =
+              vid.classList.contains('hero-cycle-video') ||
+              vid.classList.contains('contact-cycle-vid') ||
+              vid.closest('#heroVideoCarousel');
+            const isActiveManagedVideo =
+              vid.classList.contains('active') ||
+              vid.classList.contains('active-video');
+
+            if (isManagedCarouselVideo && !isActiveManagedVideo) return;
             vid.muted = true;
             vid.play().catch(function(){});
           }
         });
       }, { threshold: 0.3 });
-      
+
       allHeroVideos.forEach(function(video) {
         videoObserver.observe(video);
       });
@@ -885,14 +1726,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // Handle Contact Form Submission
 function handleContactFormSubmit(form) {
     const formData = new FormData(form);
-    
+
     // Here you would typically send the data to your backend
     // For now, we'll just show a success message
     console.log('Form submitted with data:', Object.fromEntries(formData));
-    
+
     // Show success message
     showNotification('Thank you! We received your message. We will get back to you soon.', 'success');
-    
+
     // Reset form
     form.reset();
 }
@@ -900,19 +1741,19 @@ function handleContactFormSubmit(form) {
 // Handle Newsletter Submission
 function handleNewsletterSubmit(form) {
     const email = form.querySelector('input[type="email"]').value;
-    
+
     // Validate email
     if (!isValidEmail(email)) {
         showNotification('Please enter a valid email address.', 'error');
         return;
     }
-    
+
     // Here you would typically send the email to your backend/newsletter service
     console.log('Newsletter signup:', email);
-    
+
     // Show success message
     showNotification('Thank you for subscribing!', 'success');
-    
+
     // Reset form
     form.reset();
 }
@@ -934,9 +1775,9 @@ function showNotification(message, type = 'info') {
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         animation: slideIn 0.3s ease-in-out;
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Remove notification after 5 seconds
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease-in-out';
@@ -954,11 +1795,11 @@ function isValidEmail(email) {
 function highlightActiveNavLink() {
     const currentPage = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-links a');
-    
+
     navLinks.forEach(link => {
         link.classList.remove('active');
         const href = link.getAttribute('href');
-        if (href === currentPage || 
+        if (href === currentPage ||
             (currentPage.endsWith('/') && href === '/') ||
             (currentPage.includes(href) && href !== '/')) {
             link.classList.add('active');
@@ -987,7 +1828,9 @@ window.addEventListener('scroll', function() {
 
 function createScrollToTopButton() {
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'scroll-to-top';
+    btn.setAttribute('aria-label', 'Back to top');
     btn.innerHTML = '↑';
     btn.style.cssText = `
         position: fixed;
@@ -1005,22 +1848,49 @@ function createScrollToTopButton() {
         transition: all 0.3s ease;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     `;
-    
+
+    btn.innerHTML = '<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>';
+    btn.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        min-height: 60px;
+        max-width: 60px;
+        max-height: 60px;
+        background-color: #f0a500;
+        color: #04175e;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 9999;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+        animation: floatButton 3s ease infinite;
+    `;
+
     btn.addEventListener('click', () => {
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
         });
     });
-    
+
     btn.addEventListener('mouseover', () => {
-        btn.style.backgroundColor = 'var(--secondary-color)';
+        btn.style.backgroundColor = '#d4920a';
     });
-    
+
     btn.addEventListener('mouseout', () => {
-        btn.style.backgroundColor = 'var(--primary-color)';
+        btn.style.backgroundColor = '#f0a500';
     });
-    
+
     document.body.appendChild(btn);
 }
 
@@ -1037,7 +1907,7 @@ style.textContent = `
             opacity: 1;
         }
     }
-    
+
     @keyframes slideOut {
         from {
             transform: translateX(0);
@@ -1048,15 +1918,30 @@ style.textContent = `
             opacity: 0;
         }
     }
-    
+
+    @keyframes floatButton {
+        0% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-5px);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+
     .scroll-to-top:hover {
-        transform: translateY(-3px);
+        animation-play-state: paused;
+        transform: scale(1.1);
+        box-shadow: 0 12px 30px rgba(0,0,0,.25);
     }
 `;
 document.head.appendChild(style);
 
 // === TERMS HERO IMAGE CAROUSEL ===
 (function() {
+  if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
   const termsHero = document.querySelector('.terms-hero');
   if (termsHero) {
     const slides = termsHero.querySelectorAll('.terms-image');
@@ -1116,11 +2001,11 @@ document.head.appendChild(style);
 
       setTimeout(() => {
         slides.forEach((s, i) => {
-          if (i !== current) { 
-            s.style.transition = 'none'; 
-            s.style.transform = 'translateX(0)'; 
-            s.style.opacity = '0'; 
-            s.style.zIndex = '1'; 
+          if (i !== current) {
+            s.style.transition = 'none';
+            s.style.transform = 'translateX(0)';
+            s.style.opacity = '0';
+            s.style.zIndex = '1';
           }
         });
       }, 900);
@@ -1138,6 +2023,7 @@ document.head.appendChild(style);
 
 // === PRIVACY HERO IMAGE CAROUSEL ===
 (function() {
+  if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
   const privacyHero = document.querySelector('.privacy-hero');
   if (privacyHero) {
     const slides = privacyHero.querySelectorAll('.privacy-image');
@@ -1197,11 +2083,11 @@ document.head.appendChild(style);
 
       setTimeout(() => {
         slides.forEach((s, i) => {
-          if (i !== current) { 
-            s.style.transition = 'none'; 
-            s.style.transform = 'translateX(0)'; 
-            s.style.opacity = '0'; 
-            s.style.zIndex = '1'; 
+          if (i !== current) {
+            s.style.transition = 'none';
+            s.style.transform = 'translateX(0)';
+            s.style.opacity = '0';
+            s.style.zIndex = '1';
           }
         });
       }, 900);
@@ -1217,119 +2103,14 @@ document.head.appendChild(style);
   }
 })();
 
-// === CONTACT HERO VIDEO CYCLING ===
-(function() {
-  const contactVidCycle = document.querySelector('#contactVideoCycle');
-  if (contactVidCycle) {
-    const videos = contactVidCycle.querySelectorAll('.contact-cycle-vid');
-    const dots = contactVidCycle.querySelectorAll('.ccv-dot');
-    const counter = contactVidCycle.querySelector('#ccvCounter');
-    const progressBar = contactVidCycle.querySelector('#ccvProgressBar');
-    const controlBtn = contactVidCycle.querySelector('#ccvControlBtn');
-    const ctrlIcon = contactVidCycle.querySelector('#ccvCtrlIcon');
-    
-    let current = 0;
-    let isPlaying = true;
-    let cycleInterval = null;
-    let progressInterval = null;
-
-    function updateCounter() {
-      if (counter) counter.textContent = `${current + 1} / ${videos.length}`;
-    }
-
-    function showVideo(next) {
-      const prev = current;
-      current = next;
-      
-      videos[prev].style.opacity = '0';
-      videos[prev].style.zIndex = '1';
-      
-      videos[current].style.opacity = '1';
-      videos[current].style.zIndex = '2';
-      
-      // Attempt to play
-      if (isPlaying) {
-        videos[current].play().catch(() => {
-          console.log('Autoplay prevented, waiting for user interaction');
-        });
-      }
-
-      dots.forEach((d, i) => d.classList.toggle('active', i === current));
-      updateCounter();
-      
-      // Reset progress bar
-      if (progressBar) {
-        progressBar.style.animation = 'none';
-        progressBar.offsetHeight; // Trigger reflow
-        progressBar.style.animation = 'ccvProgressAnimation 10s linear forwards';
-      }
-    }
-
-    // Pause all videos except current
-    function pauseOtherVideos() {
-      videos.forEach((v, i) => {
-        if (i !== current) {
-          v.pause();
-        }
-      });
-    }
-
-    // Control button toggle
-    if (controlBtn) {
-      controlBtn.addEventListener('click', () => {
-        isPlaying = !isPlaying;
-        ctrlIcon.textContent = isPlaying ? '⏸' : '▶';
-        if (isPlaying) {
-          videos[current].play().catch(() => {});
-          controlBtn.setAttribute('aria-label', 'Pause video');
-        } else {
-          videos[current].pause();
-          controlBtn.setAttribute('aria-label', 'Play video');
-        }
-      });
-    }
-
-    // Dot click handlers
-    dots.forEach((dot, index) => {
-      dot.addEventListener('click', () => {
-        showVideo(index);
-      });
-    });
-
-    // Initialize first video
-    videos[0].style.opacity = '1';
-    videos[0].style.zIndex = '2';
-    dots[0].classList.add('active');
-    updateCounter();
-    
-    // Start progress animation
-    if (progressBar) {
-      progressBar.style.animation = 'ccvProgressAnimation 10s linear forwards';
-    }
-
-    // Cycle videos every 10 seconds
-    cycleInterval = setInterval(() => {
-      if (isPlaying) {
-        showVideo((current + 1) % videos.length);
-      }
-    }, 10000);
-
-    // Ensure all videos start with pause (will be controlled by our logic)
-    videos.forEach(v => {
-      v.pause();
-      v.muted = true;
-      v.playsInline = true;
-    });
-  }
-})();
-
 // Initialize Testimonials Carousel (if you have multiple testimonials)
 function initializeCarousels() {
+    if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
     const carousels = document.querySelectorAll('[class*="carousel"]');
     carousels.forEach(carousel => {
         let currentSlide = 0;
         const slides = carousel.querySelectorAll('[class*="card"], [class*="item"]');
-        
+
         if (slides.length > 1) {
             // Rotate slides every 5 seconds
             setInterval(() => {
@@ -1343,31 +2124,32 @@ function initializeCarousels() {
 
 // Premium Business Areas Slider - Horizontal Carousel
 (function initBusinessAreasSlider() {
+  if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
   const track = document.getElementById('businessCardsTrack');
   const cards = Array.from(document.querySelectorAll('.business-card'));
   const prevBtn = document.getElementById('businessPrev');
   const nextBtn = document.getElementById('businessNext');
-  
+
   if (!track || cards.length === 0) return;
-  
+
   let currentIndex = 2; // Start with card-2 (Manufacturing) as featured
   let autoplayTimer = null;
   const AUTOPLAY_INTERVAL = 3000; // 3 seconds
   const TOTAL_CARDS = cards.length;
   const sliderViewport = track.parentElement;
   if (window.innerWidth <= 768) currentIndex = 0;
-  
+
   // Update slider position and card states
   function updateSlider() {
     cards.forEach((card, index) => {
       card.classList.remove('active');
     });
-    
+
     // Mark current active card
     if (cards[currentIndex]) {
       cards[currentIndex].classList.add('active');
     }
-    
+
     const activeCard = cards[currentIndex];
     const maxOffset = Math.max(0, track.scrollWidth - sliderViewport.clientWidth);
     const centeredOffset = activeCard
@@ -1376,21 +2158,21 @@ function initializeCarousels() {
     const offset = Math.max(0, Math.min(centeredOffset, maxOffset));
     track.style.transform = `translate3d(${-offset}px, 0, 0)`;
   }
-  
+
   // Move to next card
   function nextCard() {
     currentIndex = (currentIndex + 1) % TOTAL_CARDS;
     updateSlider();
     resetAutoplay();
   }
-  
+
   // Move to previous card
   function prevCard() {
     currentIndex = (currentIndex - 1 + TOTAL_CARDS) % TOTAL_CARDS;
     updateSlider();
     resetAutoplay();
   }
-  
+
   // Autoplay logic
   function startAutoplay() {
     if (autoplayTimer) clearInterval(autoplayTimer);
@@ -1398,30 +2180,30 @@ function initializeCarousels() {
       nextCard();
     }, AUTOPLAY_INTERVAL);
   }
-  
+
   function stopAutoplay() {
     if (autoplayTimer) clearInterval(autoplayTimer);
     autoplayTimer = null;
   }
-  
+
   function resetAutoplay() {
     stopAutoplay();
     startAutoplay();
   }
-  
+
   // Event listeners
   if (prevBtn) prevBtn.addEventListener('click', prevCard);
   if (nextBtn) nextBtn.addEventListener('click', nextCard);
-  
+
   // Pause on hover
   track.addEventListener('mouseenter', stopAutoplay);
   track.addEventListener('mouseleave', startAutoplay);
-  
+
   cards.forEach(card => {
     card.addEventListener('mouseenter', stopAutoplay);
     card.addEventListener('mouseleave', startAutoplay);
   });
-  
+
   // Handle window resize
   window.addEventListener('resize', () => {
     if (window.innerWidth <= 768 && currentIndex > TOTAL_CARDS - 1) currentIndex = 0;
@@ -1434,11 +2216,11 @@ function initializeCarousels() {
     pause: stopAutoplay,
     resume: startAutoplay
   });
-  
+
   // Initialize
   updateSlider();
   startAutoplay();
-  
+
   // Cleanup
   window.addEventListener('beforeunload', () => {
     stopAutoplay();
@@ -1447,6 +2229,7 @@ function initializeCarousels() {
 
 // About Hero - Flipping Image Carousel
 (function initAboutHeroFlip() {
+  if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
   const flipElement = document.getElementById('aboutHeroFlip');
   if (!flipElement) return;
 
@@ -1488,12 +2271,13 @@ function initializeCarousels() {
 
 /* ===== CONTACT HERO - VIDEO & IMAGE CAROUSEL ===== */
 (function initContactHero() {
+  if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER && document.querySelector('.chm-slide')) return;
   if (!document.querySelector('.contact-hero')) return;
 
   // Video play/pause control
   const chmPlayBtn = document.getElementById('chmPlayBtn');
   const chmVideo = document.querySelector('.chm-video');
-  
+
   if (chmPlayBtn && chmVideo) {
     chmPlayBtn.addEventListener('click', () => {
       if (chmVideo.paused) {
@@ -1519,7 +2303,7 @@ function initializeCarousels() {
   if (slides.length > 0) {
     const transitions = ['slide', 'zoom-in', 'slide-up', 'zoom-out'];
     let current = 0;
-    
+
     // Initialize first slide
     slides[0].style.opacity = '1';
     slides[0].style.transform = 'translateX(0) scale(1)';
@@ -1599,7 +2383,7 @@ function initializeCarousels() {
       // Validate phone number before submission
       const phoneInput = document.getElementById('phoneNumber');
       const fullPhoneInput = document.getElementById('fullPhoneNumber');
-      
+
       if (phoneInput && phoneInput.value) {
         if (phoneInput.classList.contains('error')) {
           alert('Please enter a valid phone number for the selected country');
@@ -1609,7 +2393,7 @@ function initializeCarousels() {
           submitBtn.style.opacity = '1';
           return;
         }
-        
+
         // Use the combined phone number (country code + phone)
         if (fullPhoneInput) {
           formData.set('Phone Number', fullPhoneInput.value);
@@ -1782,7 +2566,7 @@ function initializeCarousels() {
   const popup = document.getElementById('enquiryPopup');
   const closeBtn = document.getElementById('epbCloseBtn');
   const consultForm = document.getElementById('consultationForm');
-  
+
   if (!popup || !closeBtn) {
     console.warn('Modal elements not found');
     return;
@@ -1791,17 +2575,17 @@ function initializeCarousels() {
   // Function to close modal and reset form
   function closeModal() {
     console.log('🔴 Close button clicked - closing modal');
-    
+
     // Hide popup
     popup.style.display = 'none';
     console.log('Modal hidden');
-    
+
     // Reset form fields
     if (consultForm) {
       consultForm.reset();
       console.log('Form reset complete');
     }
-    
+
     // Restore scrolling
     document.body.style.overflow = '';
     console.log('Page scrolling restored');
@@ -1862,7 +2646,7 @@ function initializeCarousels() {
         setTimeout(() => {
           entry.target.classList.add('visible');
         }, index * 150);
-        
+
         // Stop observing after animation triggers
         observer.unobserve(entry.target);
       }
@@ -1898,7 +2682,7 @@ function initializeCarousels() {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const card = entry.target;
-        
+
         // Stagger the animations
         if (card.classList.contains('mv-card-mission')) {
           setTimeout(() => {
@@ -1913,7 +2697,7 @@ function initializeCarousels() {
             card.style.visibility = 'visible';
           }, 150);
         }
-        
+
         observer.unobserve(entry.target);
       }
     });
@@ -1938,6 +2722,7 @@ function initializeCarousels() {
 
 // Core Values - Premium Two-Column Auto-Sliding Carousel
 (function initCoreValuesCarousel() {
+  if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
   const imagePanel = document.querySelector('.cv-image-panel');
   const cardsPanel = document.querySelector('.cv-cards-panel');
   const imageSlides = document.querySelectorAll('.cv-image-slide');
@@ -1949,7 +2734,7 @@ function initializeCarousels() {
 
   const SLIDE_INTERVAL = 3500; // 3.5 seconds
   const valueNames = ['Integrity', 'Excellence', 'Innovation', 'Partnership', 'Sustainability'];
-  
+
   let currentIndex = 0;
   let autoplayTimeout;
   let progressTimeout;
@@ -2029,7 +2814,7 @@ function initializeCarousels() {
       if (entry.isIntersecting) {
         const card = entry.target;
         const index = parseInt(card.getAttribute('data-index')) || 0;
-        
+
         // Add visible class with stagger delay
         setTimeout(() => {
           card.classList.add('visible');
@@ -2037,7 +2822,7 @@ function initializeCarousels() {
           card.style.transform = 'translateY(0)';
           card.style.visibility = 'visible';
         }, index * 120);
-        
+
         // Stop observing after animation triggers
         observer.unobserve(card);
       }
@@ -2087,7 +2872,7 @@ if ('IntersectionObserver' in window) {
             }
         });
     });
-    
+
     document.querySelectorAll('img.lazy').forEach(img => imageObserver.observe(img));
 }
 
@@ -2133,20 +2918,21 @@ if ('IntersectionObserver' in window) {
 
 // Image Carousel - Why Choose Us Section
 (function initGalleryCarousel() {
+    if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
     const whyChooseSection = document.querySelector('.why-choose-us');
     if (!whyChooseSection) return;
-    
+
     const slides = whyChooseSection.querySelectorAll('.carousel-slide');
     const indicators = whyChooseSection.querySelectorAll('.carousel-indicators .indicator');
     const wrapper = whyChooseSection.querySelector('.carousel-wrapper');
     const cards = whyChooseSection.querySelectorAll('.premium-card');
-    
+
     if (slides.length === 0 || !wrapper) return;
-    
+
     let currentIndex = 0;
     const totalSlides = slides.length;
     let isTransitioning = false;
-    
+
     // Map slide values to card indices
     const valueToCardIndex = {
         'integrity': 0,
@@ -2156,60 +2942,60 @@ if ('IntersectionObserver' in window) {
         'sustainability': 4,
         'global_perspective': 5
     };
-    
+
     function highlightCard(value) {
         // Remove highlight from all cards
         cards.forEach(card => card.classList.remove('highlighted'));
-        
+
         // Find and highlight the card matching this value
         const cardIndex = valueToCardIndex[value];
         if (cardIndex !== undefined && cards[cardIndex]) {
             cards[cardIndex].classList.add('highlighted');
         }
     }
-    
+
     function showSlide(index) {
         if (isTransitioning) return;
         isTransitioning = true;
-        
+
         // Remove active class from all slides
         slides.forEach(slide => {
             slide.classList.remove('active');
         });
-        
+
         // Add active class to current slide
         slides[index].classList.add('active');
-        
+
         // Get the slide value and highlight corresponding card
         const slideValue = slides[index].dataset.value;
         if (slideValue) {
             highlightCard(slideValue);
         }
-        
+
         // Update indicators
         indicators.forEach((indicator, i) => {
             indicator.classList.toggle('active', i === index);
         });
-        
+
         // Reset transition flag after animation
         setTimeout(() => {
             isTransitioning = false;
         }, 800);
     }
-    
+
     function nextSlide() {
         currentIndex = (currentIndex + 1) % totalSlides;
         showSlide(currentIndex);
     }
-    
+
     function goToSlide(index) {
         currentIndex = index;
         showSlide(currentIndex);
     }
-    
+
     // Initialize first slide
     showSlide(0);
-    
+
     // Auto-advance carousel every 4 seconds
     let carouselInterval = setInterval(nextSlide, 4000);
 
@@ -2221,16 +3007,16 @@ if ('IntersectionObserver' in window) {
         clearInterval(carouselInterval);
         carouselInterval = setInterval(nextSlide, 4000);
     }
-    
+
     // Pause on hover
     wrapper.addEventListener('mouseenter', () => {
         stopGalleryAutoplay();
     });
-    
+
     wrapper.addEventListener('mouseleave', () => {
         startGalleryAutoplay();
     });
-    
+
     // Add click handlers to indicators
     indicators.forEach((indicator, index) => {
         indicator.addEventListener('click', () => {
@@ -2253,7 +3039,7 @@ if ('IntersectionObserver' in window) {
         pause: stopGalleryAutoplay,
         resume: startGalleryAutoplay
     });
-    
+
     // Add keyboard navigation
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') {
@@ -2271,34 +3057,35 @@ if ('IntersectionObserver' in window) {
 
 // Premium Mission & Vision Sliders
 (function initPremiumSliders() {
+    if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
     // Initialize Mission Slider
     initPremiumSlider('.mission-slider', 4000);
-    
+
     // Initialize Vision Slider
     initPremiumSlider('.vision-slider', 4000);
-    
+
     function initPremiumSlider(sliderSelector, slideDuration) {
         const slider = document.querySelector(sliderSelector);
         if (!slider) return;
-        
+
         const track = slider.querySelector('.slider-track');
         const slides = slider.querySelectorAll('.slide');
-        
+
         if (slides.length === 0) return;
-        
+
         let currentIndex = 0;
         const totalSlides = slides.length;
-        
+
         function showSlide(index) {
             // Remove active class from all slides
             slides.forEach(slide => {
                 slide.classList.remove('active');
             });
-            
+
             // Add active class to current slide
             slides[index].classList.add('active');
         }
-        
+
         function nextSlide() {
             currentIndex = (currentIndex + 1) % totalSlides;
             showSlide(currentIndex);
@@ -2308,10 +3095,10 @@ if ('IntersectionObserver' in window) {
             currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
             showSlide(currentIndex);
         }
-        
+
         // Show first slide
         showSlide(0);
-        
+
         // Auto-advance every 4 seconds
         let sliderInterval = setInterval(nextSlide, slideDuration);
 
@@ -2323,12 +3110,12 @@ if ('IntersectionObserver' in window) {
             clearInterval(sliderInterval);
             sliderInterval = setInterval(nextSlide, slideDuration);
         }
-        
+
         // Pause on hover
         slider.addEventListener('mouseenter', () => {
             stopSliderAutoplay();
         });
-        
+
         slider.addEventListener('mouseleave', () => {
             startSliderAutoplay();
         });
@@ -2350,22 +3137,23 @@ if ('IntersectionObserver' in window) {
 
 // Core Values Image Slider
 (function initCoreValuesSlider() {
+    if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
     const valuesSlider = document.querySelector('.values-slider');
     if (!valuesSlider) return;
-    
+
     const track = valuesSlider.querySelector('.slider-track');
     const slides = valuesSlider.querySelectorAll('.slider-slide');
-    
+
     if (slides.length === 0) return;
-    
+
     let currentIndex = 0;
     const totalSlides = slides.length;
-    
+
     function showSlide(index) {
         slides.forEach(slide => slide.classList.remove('active'));
         slides[index].classList.add('active');
     }
-    
+
     function nextSlide() {
         currentIndex = (currentIndex + 1) % totalSlides;
         showSlide(currentIndex);
@@ -2375,10 +3163,10 @@ if ('IntersectionObserver' in window) {
         currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
         showSlide(currentIndex);
     }
-    
+
     // Show first slide
     showSlide(0);
-    
+
     // Auto-advance every 4 seconds
     let sliderInterval = setInterval(nextSlide, 4000);
 
@@ -2390,12 +3178,12 @@ if ('IntersectionObserver' in window) {
         clearInterval(sliderInterval);
         sliderInterval = setInterval(nextSlide, 4000);
     }
-    
+
     // Pause on hover
     valuesSlider.addEventListener('mouseenter', () => {
         stopValuesAutoplay();
     });
-    
+
     valuesSlider.addEventListener('mouseleave', () => {
         startValuesAutoplay();
     });
@@ -2418,13 +3206,13 @@ if ('IntersectionObserver' in window) {
 (function initIndustriesSection() {
     const featuredImage = document.getElementById('industry-featured-image');
     const industryCards = document.querySelectorAll('.industry-card');
-    
+
     if (!featuredImage || industryCards.length === 0) return;
 
     // Change featured image with fade animation
     function changeImage(card) {
         const imageUrl = card.dataset.image;
-        
+
         // Update active state on all cards
         industryCards.forEach(c => c.classList.remove('active'));
         card.classList.add('active');
@@ -2435,10 +3223,10 @@ if ('IntersectionObserver' in window) {
         setTimeout(() => {
             featuredImage.src = imageUrl;
             featuredImage.style.transition = 'none';
-            
+
             // Trigger reflow to reset transition
             void featuredImage.offsetWidth;
-            
+
             // Fade in new image
             featuredImage.style.transition = 'opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             featuredImage.style.opacity = '1';
@@ -2460,21 +3248,22 @@ if ('IntersectionObserver' in window) {
 
 // Initialize About Hero Image Carousel
 (function initAboutHeroCarousel() {
+    if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
     const aboutHeroSection = document.getElementById('aboutHeroSection');
     if (!aboutHeroSection) return;
-    
+
     const images = aboutHeroSection.querySelectorAll('.about-hero-image');
     const dots = aboutHeroSection.querySelectorAll('.about-hero-dot');
-    
+
     if (images.length === 0) return;
-    
+
     // Transition types cycling array
     const transitionTypes = ['slide-right', 'zoom-in', 'slide-up', 'flip', 'zoom-out'];
-    
+
     let currentIndex = 0;
     let transitionIndex = 0;
     let isTransitioning = false;
-    
+
     // Map transition types to CSS class names
     const transitionClassMap = {
         'slide-right': { exit: 'slide-exit-left', enter: 'slide-enter-right' },
@@ -2483,83 +3272,83 @@ if ('IntersectionObserver' in window) {
         'flip': { exit: 'flip-exit', enter: 'flip-enter' },
         'zoom-out': { exit: 'zoomout-exit', enter: 'zoomout-enter' }
     };
-    
+
     function updateDots(index) {
         dots.forEach((dot, i) => {
             dot.classList.toggle('active', i === index);
         });
     }
-    
+
     function cycleImages() {
         if (isTransitioning) return;
         isTransitioning = true;
-        
+
         const currentImage = images[currentIndex];
         const nextIndex = (currentIndex + 1) % images.length;
         const nextImage = images[nextIndex];
-        
+
         // Get transition type for this cycle
         const transType = transitionTypes[transitionIndex];
         const classes = transitionClassMap[transType];
-        
+
         // Apply exit animation to current image
         currentImage.classList.remove('active');
         currentImage.classList.add(classes.exit);
-        
+
         // Apply enter animation to next image
         nextImage.classList.add(classes.enter);
-        
+
         // After animation completes, cleanup and prepare for next cycle
         setTimeout(() => {
             // Remove all animation classes
             currentImage.classList.remove(classes.exit);
             nextImage.classList.remove(classes.enter);
-            
+
             // Mark new image as active
             nextImage.classList.add('active');
-            
+
             // Update indices
             currentIndex = nextIndex;
             transitionIndex = (transitionIndex + 1) % transitionTypes.length;
-            
+
             // Update dots
             updateDots(currentIndex);
-            
+
             isTransitioning = false;
         }, 900);
     }
-    
+
     // Initialize carousel
     updateDots(0);
-    
+
     // Start auto-cycling every 3 seconds
     const carouselInterval = setInterval(cycleImages, 3000);
-    
+
     // Allow manual dot clicks
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
             if (isTransitioning || index === currentIndex) return;
-            
+
             clearInterval(carouselInterval);
-            
+
             // Show image at clicked index
             images.forEach(img => img.classList.remove('active'));
             images[index].classList.add('active');
             currentIndex = index;
             updateDots(index);
-            
+
             // Restart carousel
             setTimeout(() => {
                 carouselInterval = setInterval(cycleImages, 3000);
             }, 1000);
         });
     });
-    
+
     // Pause carousel on hover
     aboutHeroSection.addEventListener('mouseenter', () => {
         clearInterval(carouselInterval);
     });
-    
+
     aboutHeroSection.addEventListener('mouseleave', () => {
         carouselInterval = setInterval(cycleImages, 3000);
     });
@@ -2570,12 +3359,13 @@ if ('IntersectionObserver' in window) {
    =========================================== */
 
 (function initServicesHero() {
+    if (window.JOEL_USE_GLOBAL_ANIMATION_MANAGER) return;
     const servicesHeroSection = document.getElementById('servicesHeroSection');
     if (!servicesHeroSection) return;
 
     const images = servicesHeroSection.querySelectorAll('.services-hero-image');
     const dots = servicesHeroSection.querySelectorAll('.services-hero-dot');
-    
+
     if (images.length === 0) return;
 
     const transitionTypes = ['slide-right', 'zoom-in', 'slide-up', 'flip', 'zoom-out'];
@@ -2647,12 +3437,12 @@ if ('IntersectionObserver' in window) {
     window.addEventListener('load', () => {
         startServicesHeroAutoplay();
     }, { once: true });
-    
+
     // Pause carousel on hover
     servicesHeroSection.addEventListener('mouseenter', () => {
         stopServicesHeroAutoplay();
     });
-    
+
     servicesHeroSection.addEventListener('mouseleave', () => {
         startServicesHeroAutoplay();
     });
@@ -2725,12 +3515,12 @@ if ('IntersectionObserver' in window) {
 
 
 // Export functions for external use
-window.consultantWebsite = {
+window.consultantWebsite = Object.assign(window.consultantWebsite || {}, {
     showNotification,
     isValidEmail,
     handleContactFormSubmit,
     handleNewsletterSubmit
-};
+});
 
 /* ===== LEADERSHIP PROFILE EXPANDABLE SECTION ===== */
 (function initLeadershipProfileToggle() {
@@ -2759,6 +3549,8 @@ window.consultantWebsite = {
       // Scroll back to button
       setTimeout(() => {
         profileBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
   });
 })();
 
@@ -2767,6 +3559,7 @@ window.consultantWebsite = {
 // Services Grid — Collapsed & Expanded Layout Manager
 (function() {
   function initServicesGrid() {
+    if (window.JOEL_USE_INLINE_SERVICES_TOGGLE) return;
     var toggleBtn  = document.getElementById('servicesToggleBtn');
     var videoPanel = document.getElementById('servicesVideoPanel');
     var grid       = document.getElementById('servicesGrid');
@@ -2863,6 +3656,7 @@ window.consultantWebsite = {
 
 (function() {
   function initServicesToggle() {
+    if (window.JOEL_USE_INLINE_SERVICES_TOGGLE) return;
     var toggleBtn = document.getElementById('servicesToggleBtn');
     if (!toggleBtn) return;
 
@@ -2964,4 +3758,53 @@ window.consultantWebsite = {
   } else {
     initServicesToggle();
   }
+})();
+
+// === MISSION & VISION IMAGE LOADER ===
+(function() {
+  'use strict';
+
+  function loadMissionVisionImages() {
+    // Mission Image
+    var missionImg = document.querySelector('.mission-img-container img, .mission-image img');
+    if (missionImg) {
+      missionImg.src = 'assets/images/mission.jpg';
+      missionImg.style.display = 'block';
+      missionImg.style.width = '100%';
+      missionImg.style.height = '100%';
+      missionImg.style.objectFit = 'cover';
+      missionImg.style.minHeight = '320px';
+      missionImg.loading = 'eager';
+      missionImg.onerror = function() {
+        this.onerror = null;
+        this.src = 'assets/images/mission1.jpg';
+      };
+    }
+
+    // Vision Image
+    var visionImg = document.querySelector('.vision-img-container img, .vision-image img');
+    if (visionImg) {
+      visionImg.src = 'assets/images/vision.jpg';
+      visionImg.style.display = 'block';
+      visionImg.style.width = '100%';
+      visionImg.style.height = '100%';
+      visionImg.style.objectFit = 'cover';
+      visionImg.style.minHeight = '320px';
+      visionImg.loading = 'eager';
+      visionImg.onerror = function() {
+        this.onerror = null;
+        this.src = 'assets/images/vision1.jpg';
+      };
+    }
+  }
+
+  // Run on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadMissionVisionImages);
+  } else {
+    loadMissionVisionImages();
+  }
+
+  // Also run on window load as safety
+  window.addEventListener('load', loadMissionVisionImages);
 })();

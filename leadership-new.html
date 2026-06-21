@@ -12,7 +12,7 @@ content="Meet Okafor C. Arinze, Founder and CEO of JOEL INVESTMENT, TRADE AND RE
 
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="assets/css/responsive.css">
-
+<link rel="stylesheet" href="assets/css/mobile-responsive-complete.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet"
@@ -47,7 +47,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
   "address": [
     {
       "@type": "PostalAddress",
-      "streetAddress": "10 Kassim Street Weija",
+      "streetAddress": "10 Kassim Street",
       "addressLocality": "Accra",
       "addressCountry": "Ghana"
     },
@@ -722,26 +722,29 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
 <!-- Header -->
 <header class="header">
-    <div class="container nav-container">
-        <a href="index.html" class="logo">
-            <img src="assets/images/logo/joel_investment_logo2.jpeg" alt="JOEL Investment Logo">
-        </a>
-        <nav class="navbar">
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About Us</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="leadership.html" class="active">Leadership</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </nav>
-        <div class="mobile-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</header>
+            <div class="container nav-container">
+                <a href="index.html" class="logo">
+                    <img
+                        src="assets/images/logo/joel_investment_logo.png"
+                        alt="JOEL Investment Logo"
+                    />
+                </a>
+                <nav class="navbar">
+                    <ul class="nav-links" id="mainNavList">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="leadership.html" class="active">Leadership</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+                <button class="hamburger-btn" id="mainHamburgerBtn" aria-label="Toggle navigation menu" type="button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
 
 <!-- PROMPT 1: LEADERSHIP HERO SECTION -->
 <section class="leadership-hero">
@@ -979,7 +982,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 (function initLeadershipHero() {
   const carousel = document.getElementById('leadershipHeroCarousel');
   const dotsContainer = document.getElementById('leadershipHeroDots');
-  if (!carousel) return;
+  if (!carousel || !dotsContainer) return;
 
   const images = [
     'assets/images/portfolio/Mr. Arinze Okarfo.jpeg',
@@ -1001,6 +1004,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
   function updateImage() {
     const img = carousel.querySelector('img');
+    if (!img) return;
     img.style.opacity = '0';
     setTimeout(() => {
       img.src = images[currentIndex];
@@ -1059,5 +1063,52 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 })();
 </script>
 
+<script src="assets/js/mobile-fixes.js"></script>
+<script>
+(function() {
+  var btn = document.getElementById('mainHamburgerBtn');
+  var nav = document.getElementById('mainNavList');
+  if (!btn || !nav) return;
+
+  // Create backdrop element once
+  var backdrop = document.createElement('div');
+  backdrop.className = 'nav-backdrop';
+  document.body.appendChild(backdrop);
+
+  function openMenu() {
+    nav.classList.add('is-open');
+    backdrop.classList.add('is-visible');
+    btn.classList.add('is-active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    nav.classList.remove('is-open');
+    backdrop.classList.remove('is-visible');
+    btn.classList.remove('is-active');
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    nav.classList.contains('is-open') ? closeMenu() : openMenu();
+  });
+
+  backdrop.addEventListener('click', closeMenu);
+
+  nav.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', closeMenu);
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) closeMenu();
+  });
+})();
+</script>
 </body>
 </html>
