@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Business Areas | JOEL INVESTMENT</title>
     <meta name="description" content="Explore our comprehensive business areas and industry solutions.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -258,6 +259,18 @@
             color: #b0bbd0;
             transition: all 0.3s ease;
             z-index: 20;
+            overflow: visible;
+        }
+
+        .business-areas-arrow i {
+            font-size: 22px;
+            color: #ffffff;
+            display: block;
+            opacity: 1;
+            visibility: visible;
+            line-height: 1;
+            position: relative;
+            z-index: 21;
         }
 
         .business-areas-arrow:hover {
@@ -370,17 +383,29 @@
             }
 
             .business-areas-arrow {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
+                width: 56px;
+                height: 56px;
+                font-size: 22px;
+                z-index: 10000;
+                overflow: visible;
             }
 
             .business-areas-arrow.left {
-                left: 5px;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
             }
 
             .business-areas-arrow.right {
-                right: 5px;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            .business-areas-arrow i {
+                font-size: 22px;
+                opacity: 1;
+                visibility: visible;
             }
 
             /* 1 Card visible on mobile */
@@ -447,7 +472,7 @@
         <div class="business-areas-showcase">
             <!-- Left Arrow -->
             <button class="business-areas-arrow left" id="prevBtn" aria-label="Previous business area">
-                ←
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
             </button>
 
             <!-- Slider Track -->
@@ -459,7 +484,7 @@
 
             <!-- Right Arrow -->
             <button class="business-areas-arrow right" id="nextBtn" aria-label="Next business area">
-                →
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
             </button>
         </div>
     </div>

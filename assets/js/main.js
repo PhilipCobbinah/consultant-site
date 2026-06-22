@@ -60,8 +60,8 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
 (function initHomeHeroMediaSequence() {
   'use strict';
 
-  const IMAGE_DURATION = 5000;
-  const MAX_VIDEO_DURATION = 10000;
+  const IMAGE_DURATION = 3000;
+  const MAX_VIDEO_DURATION = 5000;
 
   function ready(fn) {
     if (document.readyState === 'loading') {
@@ -100,6 +100,7 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
     let activeVideo = null;
     let videoEndedHandler = null;
     let videoMetadataHandler = null;
+    let videoTimeUpdateHandler = null;
 
     videos.forEach(function(video) {
       video.classList.add('hero-media-item');
@@ -148,11 +149,13 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
       if (activeVideo) {
         if (videoEndedHandler) activeVideo.removeEventListener('ended', videoEndedHandler);
         if (videoMetadataHandler) activeVideo.removeEventListener('loadedmetadata', videoMetadataHandler);
+        if (videoTimeUpdateHandler) activeVideo.removeEventListener('timeupdate', videoTimeUpdateHandler);
         if (resetActive) resetVideo(activeVideo);
       }
       activeVideo = null;
       videoEndedHandler = null;
       videoMetadataHandler = null;
+      videoTimeUpdateHandler = null;
     }
 
     function resetVideo(video) {
@@ -170,12 +173,6 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
       });
     }
 
-    function getKnownVideoDurationMs(video) {
-      return Number.isFinite(video.duration) && video.duration > 0
-        ? Math.min(video.duration * 1000, MAX_VIDEO_DURATION)
-        : MAX_VIDEO_DURATION;
-    }
-
     function scheduleVideoAdvance(video) {
       activeVideo = video;
       const startedAt = Date.now();
@@ -184,7 +181,8 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
         if (activeVideo !== video || paused) return;
         clearVideoTimerAndHandlers(false);
         resetVideo(video);
-        showItem(currentIndex + 1);
+        const nextIndex = currentIndex + 1 >= items.length ? 1 : currentIndex + 1;
+        showItem(nextIndex);
       }
 
       function armMaxTimer() {
@@ -195,27 +193,41 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
       }
 
       videoEndedHandler = function() {
-        window.clearTimeout(timer);
+        if (activeVideo !== video || paused) return;
+        if (Date.now() - startedAt < MAX_VIDEO_DURATION) {
+          resetVideo(video);
+          const replayPromise = video.play();
+          if (replayPromise && typeof replayPromise.catch === 'function') {
+            replayPromise.catch(function() {});
+          }
+          return;
+        }
         advance();
+      };
+
+      videoTimeUpdateHandler = function() {
+        if (activeVideo !== video || paused) return;
+        const elapsed = Math.min(Date.now() - startedAt, MAX_VIDEO_DURATION);
+        if (currentTime) {
+          currentTime.textContent = formatTime(elapsed);
+        }
+        if (elapsed >= MAX_VIDEO_DURATION) {
+          advance();
+        }
       };
 
       videoMetadataHandler = function() {
         resetProgress({
           type: 'video',
           element: video,
-          duration: getKnownVideoDurationMs(video)
+          duration: MAX_VIDEO_DURATION
         });
-
-        if (Number.isFinite(video.duration) && video.duration > 0 && video.duration <= (MAX_VIDEO_DURATION / 1000)) {
-          window.clearTimeout(timer);
-          timer = null;
-        } else {
-          armMaxTimer();
-        }
+        armMaxTimer();
       };
 
       video.addEventListener('ended', videoEndedHandler);
       video.addEventListener('loadedmetadata', videoMetadataHandler);
+      video.addEventListener('timeupdate', videoTimeUpdateHandler);
       armMaxTimer();
 
       if (video.readyState >= 1) {
@@ -458,6 +470,7 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
     let videoTimer = null;
     let videoEndedHandler = null;
     let videoMetadataHandler = null;
+    let videoTimeUpdateHandler = null;
 
     function getItemVideo(item) {
       if (!item) return null;
@@ -480,12 +493,14 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
       if (activeVideo) {
         if (videoEndedHandler) activeVideo.removeEventListener('ended', videoEndedHandler);
         if (videoMetadataHandler) activeVideo.removeEventListener('loadedmetadata', videoMetadataHandler);
+        if (videoTimeUpdateHandler) activeVideo.removeEventListener('timeupdate', videoTimeUpdateHandler);
         if (resetCurrent) resetManagedVideo(activeVideo);
       }
 
       activeVideo = null;
       videoEndedHandler = null;
       videoMetadataHandler = null;
+      videoTimeUpdateHandler = null;
     }
 
     function getVideoDurationMs(video) {
@@ -518,6 +533,13 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
         advance();
       };
 
+      videoTimeUpdateHandler = function() {
+        if (activeVideo !== video || controller.paused || globallyPaused) return;
+        if (Number.isFinite(video.currentTime) && video.currentTime >= (controller.maxVideoDuration / 1000)) {
+          advance();
+        }
+      };
+
       videoMetadataHandler = function() {
         const durationMs = getVideoDurationMs(video);
         if (typeof config.onVideoDuration === 'function') {
@@ -534,6 +556,7 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
 
       video.addEventListener('ended', videoEndedHandler);
       video.addEventListener('loadedmetadata', videoMetadataHandler);
+      video.addEventListener('timeupdate', videoTimeUpdateHandler);
       armMaxDurationTimer();
 
       if (video.readyState >= 1) {
@@ -659,7 +682,9 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
     track.dataset.joelAnimationBound = 'true';
     root.classList.add('joel-managed-root');
 
+    const BUSINESS_CARD_INTERVAL = 3000;
     let index = window.innerWidth <= 768 ? 0 : Math.min(2, cards.length - 1);
+    let lastCardChange = Date.now();
     const controller = {
       root: root,
       visible: true,
@@ -667,6 +692,7 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
       paused: false,
       show: function(nextIndex) {
         index = (nextIndex + cards.length) % cards.length;
+        lastCardChange = Date.now();
         cards.forEach(function(card, cardIndex) {
           card.classList.toggle('active', cardIndex === index);
           card.classList.toggle('is-active', cardIndex === index);
@@ -682,10 +708,13 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
       prev: function() { controller.show(index - 1); },
       tick: function() {
         if (!controller.visible || controller.hovered || controller.paused || globallyPaused) return;
-        controller.next();
+        if (Date.now() - lastCardChange >= BUSINESS_CARD_INTERVAL) controller.next();
       },
       pause: function() { controller.paused = true; },
-      resume: function() { controller.paused = false; },
+      resume: function() {
+        controller.paused = false;
+        lastCardChange = Date.now();
+      },
       reset: function() { controller.show(window.innerWidth <= 768 ? 0 : Math.min(2, cards.length - 1)); }
     };
 
@@ -701,7 +730,10 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
     });
 
     root.addEventListener('mouseenter', function() { controller.hovered = true; });
-    root.addEventListener('mouseleave', function() { controller.hovered = false; });
+    root.addEventListener('mouseleave', function() {
+      controller.hovered = false;
+      lastCardChange = Date.now();
+    });
     window.addEventListener('resize', function() { controller.show(index); });
 
     if (typeof addSwipeNavigation === 'function') {
@@ -709,7 +741,10 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
         next: controller.next,
         prev: controller.prev,
         pause: function() { controller.hovered = true; },
-        resume: function() { controller.hovered = false; }
+        resume: function() {
+          controller.hovered = false;
+          lastCardChange = Date.now();
+        }
       });
     }
 
@@ -903,13 +938,9 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
     register(createCoreValuesPremiumController());
 
     document.querySelectorAll('.hero-video-cycle').forEach(function(root) {
+      if (root.id === 'heroVideoCarousel') return;
       const videos = toArray(root.querySelectorAll('video'));
       if (videos.length === 0) return;
-      if (root.id === 'heroVideoCarousel') {
-        root.classList.add('visible');
-        const heroImage = document.getElementById('heroImageMain');
-        if (heroImage) heroImage.classList.add('hidden');
-      }
       register(createSequenceController({
         root: root,
         items: videos,
@@ -975,7 +1006,11 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
     });
 
     document.querySelectorAll('.mission-slider .slider-container, .vision-slider .slider-container').forEach(function(root) {
-      registerSequence(root, '.slide', '.indicator, [class*="dot"]');
+      registerSequence(root, '.slide', '.indicator, [class*="dot"]', {
+        interval: 4000,
+        animationDuration: 800,
+        transitionMode: 'slide'
+      });
     });
 
     document.querySelectorAll('.values-slider .slider-container').forEach(function(root) {
@@ -1167,7 +1202,7 @@ window.JOEL_USE_GLOBAL_ANIMATION_MANAGER = true;
       var playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(function() {
-          // Autoplay blocked — show poster as background
+          // Autoplay blocked - show poster as background
           video.classList.add('video-fallback-active');
           if (video.poster) {
             video.style.backgroundImage = 'url("' + video.poster + '")';
@@ -3760,51 +3795,70 @@ window.consultantWebsite = Object.assign(window.consultantWebsite || {}, {
   }
 })();
 
-// === MISSION & VISION IMAGE LOADER ===
+// === MISSION & VISION IMAGE PRELOADER ===
 (function() {
   'use strict';
 
-  function loadMissionVisionImages() {
-    // Mission Image
-    var missionImg = document.querySelector('.mission-img-container img, .mission-image img');
-    if (missionImg) {
-      missionImg.src = 'assets/images/mission.jpg';
-      missionImg.style.display = 'block';
-      missionImg.style.width = '100%';
-      missionImg.style.height = '100%';
-      missionImg.style.objectFit = 'cover';
-      missionImg.style.minHeight = '320px';
-      missionImg.loading = 'eager';
-      missionImg.onerror = function() {
-        this.onerror = null;
-        this.src = 'assets/images/mission1.jpg';
-      };
+  var sliderGroups = [
+    {
+      selector: '.mission-slider .slider-container',
+      sources: ['assets/images/mission.jpg', 'assets/images/mission1.jpg']
+    },
+    {
+      selector: '.vision-slider .slider-container',
+      sources: ['assets/images/vision.jpg', 'assets/images/vision1.jpg', 'assets/images/vision2.jpg', 'assets/images/vision3.jpg']
     }
+  ];
 
-    // Vision Image
-    var visionImg = document.querySelector('.vision-img-container img, .vision-image img');
-    if (visionImg) {
-      visionImg.src = 'assets/images/vision.jpg';
-      visionImg.style.display = 'block';
-      visionImg.style.width = '100%';
-      visionImg.style.height = '100%';
-      visionImg.style.objectFit = 'cover';
-      visionImg.style.minHeight = '320px';
-      visionImg.loading = 'eager';
-      visionImg.onerror = function() {
-        this.onerror = null;
-        this.src = 'assets/images/vision1.jpg';
-      };
-    }
+  function preload(src) {
+    if (!src) return;
+    var img = new Image();
+    img.decoding = 'async';
+    img.src = src;
   }
 
-  // Run on DOM ready
+  function prepareSlider(group) {
+    var root = document.querySelector(group.selector);
+    if (!root) return;
+    var slides = Array.prototype.slice.call(root.querySelectorAll('.slide'));
+    if (!slides.length) return;
+
+    group.sources.forEach(preload);
+
+    var hasActiveSlide = slides.some(function(slide) {
+      return slide.classList.contains('active') || slide.classList.contains('is-active');
+    });
+
+    slides.forEach(function(slide, index) {
+      var img = slide.querySelector('img');
+      if (img) {
+        img.loading = 'eager';
+        img.decoding = 'async';
+        img.style.display = 'block';
+        img.onerror = function() {
+          var fallback = group.sources[index] || group.sources[0];
+          if (fallback && img.getAttribute('src') !== fallback) {
+            img.src = fallback;
+          }
+        };
+        preload(img.currentSrc || img.src);
+      }
+
+      slide.style.display = 'block';
+      slide.style.visibility = 'visible';
+      if (!hasActiveSlide && index === 0) slide.classList.add('active');
+    });
+  }
+
+  function loadMissionVisionImages() {
+    sliderGroups.forEach(prepareSlider);
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadMissionVisionImages);
   } else {
     loadMissionVisionImages();
   }
 
-  // Also run on window load as safety
   window.addEventListener('load', loadMissionVisionImages);
 })();

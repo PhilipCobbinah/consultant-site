@@ -1206,3 +1206,376 @@ button.ccv-control-btn,
     z-index: 1080 !important;
   }
 }
+
+/* ============ CASCADE GUARD: SERVICES HERO RESPONSIVE STACK ============ */
+@media (max-width: 1024px) {
+  .services-hero-section {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    overflow: hidden !important;
+  }
+
+  .services-hero-left,
+  .services-hero-right {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    clip-path: none !important;
+    overflow: hidden !important;
+    transform: none !important;
+  }
+
+  .services-hero-right {
+    order: 1 !important;
+    height: 420px !important;
+    min-height: 420px !important;
+  }
+
+  .services-hero-left {
+    order: 2 !important;
+    padding: 56px 40px !important;
+  }
+
+  .services-hero-content {
+    width: 100% !important;
+    max-width: 820px !important;
+    margin: 0 auto !important;
+  }
+
+  .services-hero-videos-container {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: inherit !important;
+  }
+
+  .services-hero-video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .services-hero-section {
+    padding: 0 !important;
+  }
+
+  .services-hero-right {
+    height: 340px !important;
+    min-height: 340px !important;
+  }
+
+  .services-hero-left {
+    padding: 42px 24px !important;
+  }
+
+  .services-hero-buttons {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-hero-right {
+    height: 290px !important;
+    min-height: 290px !important;
+  }
+
+  .services-hero-left {
+    padding: 36px 20px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .services-hero-right {
+    height: 250px !important;
+    min-height: 250px !important;
+  }
+}
+
+/* ============ CASCADE GUARD: LEADERSHIP SPOTLIGHT MOBILE ============ */
+@media (max-width: 768px) {
+  .leadership-spotlight {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 56px 20px !important;
+    overflow: hidden !important;
+  }
+
+  .spotlight-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    gap: 0 !important;
+    margin: 0 auto !important;
+  }
+
+  .spotlight-left {
+    width: 100% !important;
+    max-width: 420px !important;
+    overflow: hidden !important;
+    border-radius: 18px !important;
+  }
+
+  .spotlight-left img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 4 / 5 !important;
+    object-fit: cover !important;
+    object-position: top center !important;
+    border-radius: 18px !important;
+  }
+
+  .spotlight-left::after {
+    border-radius: 0 0 18px 18px !important;
+  }
+
+  .spotlight-overlay {
+    left: 22px !important;
+    right: 22px !important;
+    bottom: 22px !important;
+  }
+
+  .spotlight-right {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 680px !important;
+    padding: 30px 0 0 !important;
+    text-align: left !important;
+  }
+
+  .spotlight-right-label,
+  .spotlight-right h3,
+  .spotlight-right-subtitle {
+    text-align: center !important;
+  }
+
+  .spotlight-right-divider {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .spotlight-right-bio,
+  #fullLeadershipProfile {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #fullLeadershipProfile.is-open {
+    max-height: 2600px !important;
+  }
+
+  #fullLeadershipProfile p,
+  .spotlight-right-bio p {
+    font-size: 16px !important;
+    line-height: 1.9 !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .flp-highlights {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 20px !important;
+    margin-top: 22px !important;
+  }
+
+  .flp-highlight-item {
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .leadership-profile-btn {
+    align-self: center !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 24px auto 0 !important;
+  }
+
+  .spotlight-tags {
+    justify-content: center !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .leadership-spotlight {
+    padding: 48px 16px !important;
+  }
+
+  .spotlight-left {
+    max-width: 340px !important;
+  }
+
+  .spotlight-overlay-name {
+    font-size: 1.25rem !important;
+  }
+
+  .flp-highlights {
+    padding: 18px !important;
+  }
+}
+
+/* Business Areas carousel arrow icon repair */
+.business-slider-wrapper,
+.carousel-nav {
+  position: relative !important;
+  z-index: 9999 !important;
+  overflow: visible !important;
+}
+
+.business-slider-wrapper .business-arrow,
+.carousel-nav button {
+  z-index: 10000 !important;
+}
+
+.business-arrow,
+.carousel-prev,
+.carousel-next,
+.business-prev-btn,
+.business-next-btn {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  max-width: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+  flex: 0 0 56px !important;
+}
+
+.business-arrow i,
+.carousel-prev i,
+.carousel-next i,
+.business-prev-btn i,
+.business-next-btn i,
+.carousel-nav i {
+  font-size: 22px !important;
+  color: #ffffff !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  line-height: 1 !important;
+  position: relative !important;
+  z-index: 10001 !important;
+}
+
+@media (max-width: 768px) {
+  .business-slider-wrapper {
+    overflow: visible !important;
+  }
+
+  .business-slider-container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .business-arrow,
+  .carousel-prev,
+  .carousel-next,
+  .business-prev-btn,
+  .business-next-btn {
+    position: absolute !important;
+    top: 50% !important;
+    z-index: 10000 !important;
+  }
+
+  .business-arrow-prev,
+  .carousel-prev,
+  .business-prev-btn {
+    left: 12px !important;
+    right: auto !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .business-arrow-next,
+  .carousel-next,
+  .business-next-btn {
+    right: 12px !important;
+    left: auto !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .business-arrow-prev:hover,
+  .carousel-prev:hover,
+  .business-prev-btn:hover {
+    transform: translateY(-50%) scale(1.06) !important;
+  }
+
+  .business-arrow-next:hover,
+  .carousel-next:hover,
+  .business-next-btn:hover {
+    transform: translateY(-50%) scale(1.06) !important;
+  }
+}
+
+/* Services page card grid layout repair */
+#services-grid {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+#services-grid #servicesGrid.services-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(20px, 2.2vw, 28px) !important;
+  width: min(100%, 1320px) !important;
+  max-width: 1320px !important;
+  margin: 0 auto !important;
+  padding: 20px clamp(18px, 4vw, 48px) 60px !important;
+  box-sizing: border-box !important;
+  align-items: stretch !important;
+}
+
+#services-grid #servicesGrid > .service-card-premium,
+#services-grid #servicesGrid > .services-video-panel {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+#services-grid #servicesGrid > .service-card-premium {
+  height: 100%;
+}
+
+@media (max-width: 1024px) {
+  #services-grid #servicesGrid.services-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    max-width: 900px !important;
+    padding-inline: clamp(18px, 5vw, 40px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #services-grid #servicesGrid.services-grid {
+    grid-template-columns: 1fr !important;
+    max-width: 520px !important;
+    gap: 20px !important;
+    padding: 18px clamp(16px, 5vw, 24px) 44px !important;
+  }
+
+  #services-grid #servicesGrid > .services-video-panel {
+    grid-column: span 1 !important;
+  }
+}

@@ -1952,7 +1952,7 @@ section {
     white-space: nowrap !important;
 }
 
-/* On tablet Ã¢â‚¬â€ allow wrap */
+/* On tablet - allow wrap */
 @media (max-width: 900px) {
     .footer-social {
         flex-wrap: wrap !important;
@@ -1962,7 +1962,7 @@ section {
     }
 }
 
-/* On mobile Ã¢â‚¬â€ stack vertically */
+/* On mobile - stack vertically */
 @media (max-width: 480px) {
     .footer-social {
         flex-direction: column !important;
@@ -3990,7 +3990,7 @@ blockquote footer {
     transform: none;
 }
 
-/* Active/highlighted card Ã¢â‚¬â€ gold background */
+/* Active/highlighted card - gold background */
 .why-card.is-active .why-card-icon {
     background: linear-gradient(135deg, #f0a500, #d4920a);
 }
@@ -4676,6 +4676,46 @@ blockquote footer {
 
 .slide.active .slide-caption {
     opacity: 1;
+}
+
+.mission-slider .slider-container,
+.vision-slider .slider-container {
+    min-height: 320px;
+    isolation: isolate;
+}
+
+.mission-slider .slider-track,
+.vision-slider .slider-track {
+    min-height: inherit;
+}
+
+.mission-slider .slide,
+.vision-slider .slide {
+    display: block;
+    visibility: visible;
+    transform: translateX(100%) scale(0.98);
+    transition:
+        opacity 0.8s ease,
+        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+    pointer-events: none;
+}
+
+.mission-slider .slide.active,
+.vision-slider .slide.active,
+.mission-slider .slide.is-active,
+.vision-slider .slide.is-active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.mission-slider .slide.is-exiting,
+.vision-slider .slide.is-exiting {
+    opacity: 0;
+    transform: translateX(-100%) scale(0.98);
+    z-index: 1;
 }
 
 .slide-caption p {
@@ -6466,7 +6506,7 @@ blockquote footer {
     transform: scale(1.08);
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Services Grid Layout System Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* Services Grid Layout System */
 .services-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -6655,7 +6695,7 @@ blockquote footer {
 }
 
 .svp-play-btn.is-playing::before {
-    content: "Ã¢ÂÂ¸";
+    content: "II";
     font-size: 1.1rem;
 }
 
@@ -7868,7 +7908,7 @@ button {
 }
 
 /* ===========================================
-   CRITICAL OVERRIDES Ã¢â‚¬â€ CAROUSEL & VIDEO SIZING
+   CRITICAL OVERRIDES - CAROUSEL & VIDEO SIZING
    These must come LAST to win specificity battles
    =========================================== */
 
